@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover"/>
+<meta name="theme-color" content="#c8ff00"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="CF-BRAIN"/>
+<title>CF-BRAIN · ❯ y_</title>
+<link rel="manifest" href="manifest.json"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body,#root{height:100%;background:#010102}
+body{font-family:'Courier New',Courier,monospace;-webkit-tap-highlight-color:transparent}
+button{cursor:pointer;font-family:inherit;transition:opacity .12s;border:none}
+button:hover{opacity:.75}input,textarea{font-family:inherit}
+::-webkit-scrollbar{width:2px}
+@keyframes blink{0%,49%{opacity:1}50%,100%{opacity:0}}
+</style>
+<!-- UMD builds — no ES modules, no Babel, loads synchronously -->
+<script src="https://cdn.jsdelivr.net/npm/preact@10.22.0/dist/preact.umd.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/preact@10.22.0/hooks/dist/hooks.umd.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/htm@3.1.1/dist/htm.umd.js"></script>
+</head>
+<body>
+<div id="root"></div>
+<script>
+// ── globals from UMD
+var h=preact.h, pRender=preact.render;
+var useState=preactHooks.useState, useEffect=preactHooks.useEffect, useRef=preactHooks.useRef;
+var html=htm.bind(h);
+
+// ── themes
+var TH={
+  cf:   {p:'#c8ff00',d:'#6a9000',bg:'#070810',card:'#0f1120',dim:'#2a4000',border:'#1a2035'},
+  green:{p:'#00ff41',d:'#00882b',bg:'#020602',card:'#060d06',dim:'#003a12',border:'#0a1a0a'},
+  amber:{p:'#ffb700',d:'#cc8800',bg:'#060400',card:'#0d0900',dim:'#4a3000',border:'#1a1000'},
+  mist: {p:'#88ccff',d:'#3a88aa',bg:'#020810',card:'#060e18',dim:'#0a2840',border:'#0a1828'},
+};
+
+var BOOT=[
+  [80,  '❯ y_  CreativeFactory.studio'],
+  [220, 'rm -rf doubt  ·  --force ./buildyou'],
+  [380, '──────────────────────────────────────────'],
+  [520, '[ OK ]  Loading ADHD toolkit'],
+  [650, '[ OK ]  Mounting brain dump'],
+  [780, '[ OK ]  Syncing focus engine'],
+  [910, '[ OK ]  Initializing credential vault'],
+  [1040,'[ OK ]  Spawning tidy daemon'],
+  [1170,'[ OK ]  Connecting brief generator'],
+  [1310,'[ OK ]  Loading session: yules'],
+  [1460,'──────────────────────────────────────────'],
+  [1630,'All systems nominal. Let\'s build.'],
+  [1850,''],
+  [2020,'  TAP TO ENTER  '],
+];
+
+var APPS=[
+  {id:'focus',icon:'◉',label:'FOCUS'},{id:'dump',icon:'▤',label:'DUMP'},
+  {id:'brief',icon:'✦',label:'BRIEF'},{id:'vault',icon:'⊞',label:'VAULT'},
+  {id:'tidy', icon:'⌘',label:'TIDY'}, {id:'della',icon:'❯',label:'DELLA'},
+  {id:'prefs',icon:'⚙',label:'PREFS'},
+];
+
+var BRIDGE='http://localhost:7777';
+
+var SP={_:null,R:'#f21428',r:'#8c0a18',S:'#fdd9b5',G:'#1ed44a',W:'#fff',E:'#1a1028',p:'#ff9898',m:'#cc4040',K:'#ff79c6',k:'#c0448c',N:'#5a6aaa',n:'#3a4878',L:'#fdd9b5',B:'#181828',A:'#fdd9b5'};
+var F0=['___RRRRRRRR___','__RRRrrrrRR___','___RSSSSSSR___','____SSSSSS____','____SEESEE____','____SGWSGW____','____SSSSSS____','____SpSSpS____','____SSmmSS____','____SSSSSS____','____SKKKKS____','___KKKKKKK____','A__KKKKKK_____','A__KKKKKKK____','___KKKKKKK____','___NNNNNNN____','__NNNNNNNNN___','__nNNNNNNNn___','____LL__LL____','____LL__LL____','___BBB__BBB___','___BBB__BBB___'];
+var F1=['A___RRRRRRRR__','_A__RRRrrrrRR_','__A_RSSSSSSR__','____SSSSSS____','____SEESEE____','____SGWSGW____','____SSSSSS____','____SpSSpS____','____SSmmSS____','____SSSSSS____','____SKKKKS____','___KKKKKKK____','___KKKKKK_____','___KKKKKKK____','___KKKKKKK____','___NNNNNNN____','__NNNNNNNNN___','__nNNNNNNNn___','____LL__LL____','____LL__LL____','___BBB__BBB___','___BBB__BBB___'];
+var bSpr=function(f){return f.map(function(r,i){return(i===4||i===5)?'____SSSSSS____':r;});};
+
+function RC(n,s){return Array.from({length:n},function(){return s[Math.floor(Math.random()*s.length)];}).join('');}
+function gP(n){var a='abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ',d='0123456789',s='!@#$%^&*-_+=?';return(RC(3,a)+RC(3,d)+RC(2,s)+RC(n-8,a+d+s)).split('').sort(function(){return Math.random()-.5;}).join('');}
+function p2(n){return String(n).padStart(2,'0');}
+function fSecs(s){return p2(Math.floor(s/60))+':'+p2(s%60);}
+function fTime(d){return p2(d.getHours())+':'+p2(d.getMinutes())+':'+p2(d.getSeconds());}
+function fDate(d){return d.toLocaleDateString([],{weekday:'long',month:'long',day:'numeric'});}
+function dStr(){return new Date().toLocaleDateString([],{weekday:'short',month:'short',day:'numeric'});}
+function lg(k){try{return JSON.parse(localStorage.getItem('cfb_'+k));}catch(e){return null;}}
+function ls(k,v){try{localStorage.setItem('cfb_'+k,JSON.stringify(v));}catch(e){}}
+
+function App(){
+  var _=useState('boot'), screen=_[0], setScreen=_[1];
+  var __=useState(null), app=__[0], setApp=__[1];
+  var _t=useState(lg('theme')||'cf'), theme=_t[0], setTheme=_t[1];
+  var C=TH[theme];
+  var _n=useState(lg('nrg')||'mid'), nrg=_n[0], setNrg=_n[1];
+  var _now=useState(new Date()), now=_now[0], setNow=_now[1];
+  var _bl=useState([]), bl=_bl[0], setBl=_bl[1];
+  var _bd=useState(false), booted=_bd[0], setBooted=_bd[1];
+  var _fs=useState(25*60), fSec=_fs[0], setFSec=_fs[1];
+  var _ru=useState(false), run=_ru[0], setRun=_ru[1];
+  var _fm=useState('focus'), fMode=_fm[0], setFMode=_fm[1];
+  var _se=useState(lg('sess')||0), sess=_se[0], setSess=_se[1];
+  var _du=useState(lg('dump')||''), dump=_du[0], setDump=_du[1];
+  var _va=useState(lg('vault')||[{id:1,label:'GitHub',user:'creativefactoryops-yules',pass:'change-me-please',show:false}]), vault=_va[0], setVault=_va[1];
+  var _vv=useState('list'), vView=_vv[0], setVView=_vv[1];
+  var _vn=useState({label:'',user:'',pass:''}), vNew=_vn[0], setVNew=_vn[1];
+  var _vq=useState(''), vSearch=_vq[0], setVSearch=_vq[1];
+  var _bf=useState({worked:'',wins:'',blockers:'',loops:'',tomorrow:''}), bForm=_bf[0], setBForm=_bf[1];
+  var _bo=useState(''), bOut=_bo[0], setBO=_bo[1];
+  var _bL=useState(false), bLoad=_bL[0], setBLoad=_bL[1];
+  var _bh=useState(lg('briefs')||[]), bHist=_bh[0], setBHist=_bh[1];
+  var _tt=useState(''), tt=_tt[0], setTT=_tt[1];
+  var _td=useState(''), td=_td[0], setTD=_td[1];
+  var _tl=useState(''), tl=_tl[0], setTL=_tl[1];
+  var _np=useState((typeof Notification!=='undefined'&&Notification.permission)||'default'), nPerm=_np[0], setNPerm=_np[1];
+  var _fr=useState(0), fr=_fr[0], setFr=_fr[1];
+  var _bk=useState(false), blnk=_bk[0], setBlnk=_bk[1];
+  var _bn=useState(false), bnc=_bn[0], setBnc=_bn[1];
+  var _sp=useState(null), spch=_sp[0], setSpch=_sp[1];
+  var _dl=useState([{t:'della gate online',k:'sys'},{t:'awaiting command',k:'sys'}]), dLog=_dl[0], setDLog=_dl[1];
+  var _dc=useState(''), dCmd=_dc[0], setDCmd=_dc[1];
+  var _db=useState('checking'), dBridge=_db[0], setDBridge=_db[1];
+  var spI=useRef(0), bRan=useRef(false);
+
+  useEffect(function(){ls('theme',theme);},[theme]);
+  useEffect(function(){ls('nrg',nrg);},[nrg]);
+  useEffect(function(){ls('sess',sess);},[sess]);
+  useEffect(function(){ls('dump',dump);},[dump]);
+  useEffect(function(){ls('vault',vault.map(function(e){return Object.assign({},e,{show:false});}));},[vault]);
+  useEffect(function(){ls('briefs',bHist);},[bHist]);
+  useEffect(function(){var id=setInterval(function(){setNow(new Date());},1000);return function(){clearInterval(id);};},[]);
+  useEffect(function(){
+    if(bRan.current)return;bRan.current=true;
+    BOOT.forEach(function(item){setTimeout(function(){setBl(function(p){return p.concat(item[1]);});},item[0]);});
+    setTimeout(function(){setBooted(true);},2200);
+  },[]);
+  useEffect(function(){
+    if(!run)return;
+    var id=setInterval(function(){
+      setFSec(function(s){
+        if(s<=1){
+          setRun(false);
+          var nx=fMode==='focus'?'break':'focus';
+          setFMode(nx);if(nx==='focus')setSess(function(n){return n+1;});
+          setFSec(nx==='focus'?25*60:5*60);return 0;
+        }
+        return s-1;
+      });
+    },1000);
+    return function(){clearInterval(id);};
+  },[run,fMode]);
+  useEffect(function(){
+    var w=setInterval(function(){setFr(function(f){return 1-f;});},580);
+    var b=setInterval(function(){setBlnk(true);setTimeout(function(){setBlnk(false);},140);},3500);
+    var bo=setInterval(function(){setBnc(true);setTimeout(function(){setBnc(false);},380);},2200);
+    var sp=['rm -rf doubt','❯ y_','build mode','you got this','shipit','★','(˶ᵔᵕᵔ˶)'];
+    var si=setInterval(function(){var m=sp[spI.current++%sp.length];setSpch(m);setTimeout(function(){setSpch(null);},2200);},7500);
+    return function(){clearInterval(w);clearInterval(b);clearInterval(bo);clearInterval(si);};
+  },[]);
+
+  function go(id){setApp(id);setScreen('app');}
+  function home(){setScreen('home');setApp(null);}
+  function cp(t){try{navigator.clipboard.writeText(t);}catch(e){}}
+
+  useEffect(function(){
+    function ping(){
+      fetch(BRIDGE+'/commands').then(function(r){return r.json();})
+        .then(function(cmds){setDBridge('up:'+cmds.length);})
+        .catch(function(){setDBridge('down');});
+    }
+    ping();var id=setInterval(ping,10000);return function(){clearInterval(id);};
+  },[]);
+
+  function dellaLog(t,k){setDLog(function(p){return p.concat([{t:t,k:k||'sys'}]).slice(-40);});}
+  async function runDella(cmd){
+    if(!cmd)return;
+    dellaLog('❯ '+cmd,'prompt');
+    try{
+      var res=await fetch(BRIDGE+'/run',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({cmd:cmd})});
+      var data=await res.json();
+      if(data.error)dellaLog('[ERR] '+data.error,'err');
+      else dellaLog((data.output||'(no output)').trim(),'ok');
+    }catch(e){dellaLog('[ERR] bridge unreachable — start della-server.js','err');}
+  }
+
+  async function genBrief(){
+    setBLoad(true);setBO('');
+    try{
+      var res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:600,messages:[{role:'user',content:
+          'Personal AI for Yules — ADHD indie maker, CreativeFactory.studio, "❯ y_", "rm -rf doubt". Generate next-day brief. Kind, direct, neurodivergent-aware, ❯ bullets.\n\nTODAY: worked='+
+          (bForm.worked||dump||'?')+' energy='+nrg+' wins='+(bForm.wins||'none')+' blockers='+(bForm.blockers||td||'none')+
+          ' loops='+(bForm.loops||tl||dump||'none')+' tomorrow='+(bForm.tomorrow||'?')+' sessions='+sess+' tabs='+(tt||'none')+
+          '\n\nOUTPUT under 180 words, exact headers:\n## TODAY\n## TOMORROW\'S FIRST MOVE\n## CLOSE BEFORE SLEEP\n## REMEMBER'
+        }]})});
+      var data=await res.json();
+      var text=(data.content&&data.content[0]&&data.content[0].text)||'Error.';
+      setBO(text);
+      setBHist(function(h){return [{date:dStr(),text:text,nrg:nrg,sess:sess}].concat(h).slice(0,10);});
+    }catch(e){setBO('Connection error. Check network.');}
+    setBLoad(false);
+  }
+
+  var spr=(blnk?bSpr(fr===0?F0:F1):(fr===0?F0:F1));
+
+  function Sprite(props){
+    var px=props.px||4;
+    return html`<div style=${{lineHeight:0,imageRendering:'pixelated',display:'inline-block',transform:bnc?'translateY(-3px)':'translateY(0)',transition:'transform 0.2s'}}>
+      ${spr.map(function(row,ri){return html`<div key=${ri} style=${{display:'flex'}}>
+        ${row.split('').map(function(ch,ci){return html`<div key=${ci} style=${{width:px,height:px,background:SP[ch]||'transparent'}}/>`;})}</div>`;})}</div>`;}
+
+  function Bar(){return html`<div style=${{display:'flex',justifyContent:'space-between',padding:'6px 14px 5px',fontSize:10,color:C.p,letterSpacing:'1.5px',borderBottom:'1px solid '+C.border,flexShrink:0}}>
+    <span>${fTime(now)}</span><span style=${{color:C.d,letterSpacing:'2px',fontWeight:700}}>❯ y_</span><span style=${{opacity:.6}}>▓▓▓▓░</span></div>`;}
+
+  function Nav(){return html`<div style=${{display:'flex',justifyContent:'space-around',padding:'8px 0 10px',borderTop:'1px solid '+C.border,flexShrink:0}}>
+    ${[['◁',home],['◉',home],['▢',home]].map(function(item,i){return html`<button key=${i} onClick=${item[1]} style=${{background:'none',color:C.d,fontSize:18,padding:'2px 12px',lineHeight:1}}>${item[0]}</button>`;})}</div>`;}
+
+  function Boot(){return html`<div onClick=${booted?function(){setScreen('home');}:undefined}
+    style=${{flex:1,padding:'18px 14px',overflowY:'auto',fontSize:11,lineHeight:1.8,color:C.p,cursor:booted?'pointer':'default'}}>
+    ${bl.map(function(l,i){return html`<div key=${i} style=${{
+      color:(l.startsWith('❯')||l.startsWith('rm')||l.startsWith('[ OK ]'))?C.p:(l.includes('TAP')||l.includes('All'))?'#fff':C.d,
+      fontWeight:(l.startsWith('❯')||l.includes('All')||l.includes('TAP'))?700:400,
+      fontSize:l.startsWith('❯')?'13px':'11px',
+      background:l.includes('TAP')?C.p+'18':'transparent',
+      padding:l.includes('TAP')?'4px 8px':'0',borderRadius:4,
+      textAlign:l.includes('TAP')?'center':'left'
+    }}>${l||'\u00a0'}</div>`;})}
+    ${booted&&html`<div style=${{animation:'blink 1s infinite',color:C.p,marginTop:4}}>█</div>`}</div>`;}
+
+  function Home(){
+    var _q=useState(''),q=_q[0],setQ=_q[1];
+    return html`<div style=${{flex:1,overflowY:'auto',padding:'10px 12px',display:'flex',flexDirection:'column',gap:10}}>
+      <div style=${{textAlign:'center',padding:'8px 0 4px'}}>
+        <div style=${{fontSize:40,color:C.p,letterSpacing:'3px',lineHeight:1,textShadow:'0 0 20px '+C.p+'77'}}>${p2(now.getHours())}:${p2(now.getMinutes())}</div>
+        <div style=${{fontSize:9,color:C.d,letterSpacing:'2px',marginTop:4}}>${fDate(now)}</div>
+        <div style=${{fontSize:8,color:C.d,opacity:.35,letterSpacing:'3px',marginTop:3}}>rm -rf doubt</div>
+      </div>
+      <div style=${{display:'flex',justifyContent:'center',gap:6}}>
+        ${[['😴','low'],['⚡','mid'],['🔥','high']].map(function(item){return html`<button key=${item[1]} onClick=${function(){setNrg(item[1]);}} style=${{background:nrg===item[1]?C.p+'22':C.card,border:'1px solid '+(nrg===item[1]?C.p+'55':C.border),borderRadius:20,padding:'4px 10px',color:nrg===item[1]?C.p:C.d,fontSize:9,letterSpacing:'1px'}}>${item[0]} ${item[1]}</button>`;})}</div>
+      <div style=${{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:8}}>
+        ${APPS.map(function(a){return html`<button key=${a.id} onClick=${function(){go(a.id);}} style=${{background:C.card,border:'1px solid '+C.border,borderRadius:12,padding:'14px 6px 12px',display:'flex',flexDirection:'column',alignItems:'center',gap:5}}>
+          <span style=${{fontSize:22,color:C.p,lineHeight:1}}>${a.icon}</span>
+          <span style=${{fontSize:8,color:C.p,letterSpacing:'2px'}}>${a.label}</span></button>`;})}</div>
+      <div style=${{display:'flex',alignItems:'center',gap:8,background:C.card,border:'1px solid '+C.border,borderRadius:8,padding:'7px 12px'}}>
+        <span style=${{color:C.p,fontSize:13,fontWeight:700}}>❯</span>
+        <input value=${q} onInput=${function(e){setQ(e.target.value);}} placeholder="open focus · dump · brief · vault · tidy"
+          onKeyDown=${function(e){if(e.key==='Enter'&&q.trim()){var cmd=q.trim().toLowerCase().split(' ')[0];if(APPS.find(function(a){return a.id===cmd;}))go(cmd);setQ('');}}}
+          style=${{flex:1,background:'transparent',border:'none',outline:'none',color:C.p,fontSize:11,caretColor:C.p}}/></div></div>`;}
+
+  function Focus(){
+    var tot=fMode==='focus'?25*60:5*60;
+    var pct=((tot-fSec)/tot*100).toFixed(1);
+    return html`<div style=${{flex:1,display:'flex',flexDirection:'column',alignItems:'center',padding:'14px 16px',gap:10,overflowY:'auto'}}>
+      <div style=${{fontSize:9,color:C.d,letterSpacing:'3px'}}>${fMode==='focus'?'FOCUS SESSION':'BREAK TIME'} · #${sess+1}</div>
+      <div style=${{fontSize:58,color:C.p,letterSpacing:'4px',textShadow:'0 0 28px '+C.p+'99',lineHeight:1}}>${fSecs(fSec)}</div>
+      <div style=${{width:'100%',height:3,background:C.dim,borderRadius:2}}>
+        <div style=${{height:'100%',borderRadius:2,background:C.p,width:pct+'%',transition:'width 1s linear',boxShadow:'0 0 8px '+C.p}}/></div>
+      <div style=${{display:'flex',gap:8}}>
+        ${[['▶',function(){setRun(true);},!run],['■',function(){setRun(false);},run],['↺',function(){setRun(false);setFSec(fMode==='focus'?25*60:5*60);},true]]
+          .filter(function(x){return x[2];}).map(function(x){return html`<button key=${x[0]} onClick=${x[1]} style=${{background:C.card,border:'1px solid '+C.border,borderRadius:6,color:C.p,fontSize:16,width:42,height:36,display:'flex',alignItems:'center',justifyContent:'center'}}>${x[0]}</button>`;})}</div>
+      <div style=${{display:'flex',gap:6}}>
+        ${[['FOCUS','focus',25],['BREAK','break',5]].map(function(x){return html`<button key=${x[1]} onClick=${function(){setFMode(x[1]);setFSec(x[2]*60);setRun(false);}} style=${{background:fMode===x[1]?C.p+'18':C.card,border:'1px solid '+(fMode===x[1]?C.p+'44':C.border),borderRadius:6,color:fMode===x[1]?C.p:C.d,fontSize:9,letterSpacing:'2px',padding:'5px 10px'}}>${x[0]} ${x[2]}m</button>`;})}</div>
+      <div style=${{display:'flex',gap:6}}>
+        ${[['😴','low'],['⚡','mid'],['🔥','high']].map(function(x){return html`<button key=${x[1]} onClick=${function(){setNrg(x[1]);}} style=${{background:nrg===x[1]?C.p+'18':C.card,border:'1px solid '+(nrg===x[1]?C.p+'44':C.border),borderRadius:20,padding:'4px 9px',color:nrg===x[1]?C.p:C.dim,fontSize:9}}>${x[0]}</button>`;})}</div>
+      <div style=${{position:'relative',marginTop:4}}>
+        ${spch&&html`<div style=${{position:'absolute',top:-26,left:'50%',transform:'translateX(-50%)',background:'#fff',color:'#222',fontSize:9,padding:'2px 8px',borderRadius:6,whiteSpace:'nowrap',fontWeight:700,boxShadow:'0 2px 8px rgba(0,0,0,.4)',zIndex:10}}>
+          ${spch}<div style=${{position:'absolute',bottom:-4,left:'50%',transform:'translateX(-50%)',width:0,height:0,borderLeft:'4px solid transparent',borderRight:'4px solid transparent',borderTop:'4px solid #fff'}}/></div>`}
+        <${Sprite} px=${5}/></div>
+      <div style=${{fontSize:8,color:C.dim,letterSpacing:'2px'}}>${sess} sessions · ${nrg} energy</div></div>`;}
+
+  function Dump(){return html`<div style=${{flex:1,display:'flex',flexDirection:'column',padding:12}}>
+    <div style=${{fontSize:9,color:C.d,letterSpacing:'3px',marginBottom:8}}>BRAIN DUMP · ${dump.split('\n').filter(Boolean).length} lines</div>
+    <textarea onInput=${function(e){setDump(e.target.value);}} placeholder=${'// dump it all here\n// no structure required\n// auto-feeds BRIEF\n\n'}
+      style=${{flex:1,resize:'none',background:'transparent',border:'1px solid '+C.border,borderRadius:8,padding:10,color:C.p,fontSize:12,lineHeight:1.7,outline:'none',caretColor:C.p}}>${dump}</textarea>
+    <div style=${{display:'flex',justifyContent:'space-between',marginTop:6,fontSize:8,color:C.dim}}>
+      <span>${dump.length} chars · saved locally</span>
+      <div style=${{display:'flex',gap:10}}>
+        <button onClick=${function(){cp(dump);}} style=${{background:'none',color:C.d,fontSize:8,letterSpacing:'1px'}}>COPY</button>
+        <button onClick=${function(){setDump('');}} style=${{background:'none',color:C.d,fontSize:8,letterSpacing:'1px'}}>CLEAR</button></div></div></div>`;}
+
+  function Brief(){
+    function F(props){return html`<div style=${{marginBottom:10}}>
+      <div style=${{fontSize:9,color:C.d,letterSpacing:'2px',marginBottom:4}}>${props.label}</div>
+      <textarea rows=${props.rows||1} placeholder=${props.ph} onInput=${function(e){props.onCh(e.target.value);}}
+        style=${{width:'100%',resize:'none',background:'transparent',border:'1px solid '+C.border,borderRadius:6,padding:'7px 9px',color:C.p,fontSize:11,lineHeight:1.5,outline:'none',caretColor:C.p}}>${props.val}</textarea></div>`;}
+    return html`<div style=${{flex:1,display:'flex',flexDirection:'column',padding:12,overflowY:'auto'}}>
+      <div style=${{fontSize:9,color:C.d,letterSpacing:'3px',marginBottom:10}}>DAILY BRIEF · ${dStr()}</div>
+      ${!bOut?html`
+        <${F} label="WHAT I WORKED ON" ph="eyecode deploy, vault UI..." val=${bForm.worked} onCh=${function(v){setBForm(function(f){return Object.assign({},f,{worked:v});});}} rows=${2}/>
+        <${F} label="WINS" ph="shipped the vault feature..." val=${bForm.wins} onCh=${function(v){setBForm(function(f){return Object.assign({},f,{wins:v});});}}/>
+        <${F} label="BLOCKERS" ph="netlify env vars broken..." val=${bForm.blockers} onCh=${function(v){setBForm(function(f){return Object.assign({},f,{blockers:v});});}}/>
+        <${F} label="OPEN LOOPS" ph="lemon squeezy pending..." val=${bForm.loops} onCh=${function(v){setBForm(function(f){return Object.assign({},f,{loops:v});});}} rows=${2}/>
+        <${F} label="TOMORROW'S ONE THING" ph="push eyecode to github" val=${bForm.tomorrow} onCh=${function(v){setBForm(function(f){return Object.assign({},f,{tomorrow:v});});}}/>
+        <div style=${{fontSize:8,color:C.dim,lineHeight:1.6,marginBottom:10}}>pulling from DUMP + TIDY · energy: ${nrg} · sessions: ${sess}</div>
+        <button onClick=${genBrief} disabled=${bLoad} style=${{background:bLoad?C.dim:C.p+'14',border:'1px solid '+(bLoad?C.border:C.p+'44'),borderRadius:8,padding:'12px 0',color:bLoad?C.d:C.p,fontSize:11,letterSpacing:'3px',textShadow:bLoad?'none':'0 0 10px '+C.p+'88'}}>${bLoad?'generating...':'❯ GENERATE BRIEF'}</button>
+        ${bHist.length>0&&html`<div style=${{marginTop:12}}>
+          <div style=${{fontSize:9,color:C.dim,letterSpacing:'2px',marginBottom:6}}>PAST BRIEFS</div>
+          ${bHist.slice(0,3).map(function(b,i){return html`<button key=${i} onClick=${function(){setBO(b.text);}} style=${{display:'flex',justifyContent:'space-between',width:'100%',background:C.card,border:'1px solid '+C.border,borderRadius:6,padding:'7px 10px',marginBottom:4,color:C.d,fontSize:9,textAlign:'left'}}>
+            <span>${b.date}</span><span style=${{color:C.dim}}>${b.nrg} · ${b.sess}×</span></button>`;})}</div>`}
+      `:html`
+        <div style=${{flex:1,background:C.card,border:'1px solid '+C.p+'33',borderRadius:10,padding:12,fontSize:11,color:C.p,lineHeight:1.75,whiteSpace:'pre-wrap',overflowY:'auto',marginBottom:8}}>${bOut}</div>
+        <div style=${{display:'flex',gap:6}}>
+          <button onClick=${function(){cp(bOut);}} style=${{flex:1,background:C.card,border:'1px solid '+C.border,borderRadius:6,padding:'8px 0',color:C.d,fontSize:9,letterSpacing:'2px'}}>COPY</button>
+          <button onClick=${function(){setBO('');}} style=${{flex:1,background:C.card,border:'1px solid '+C.border,borderRadius:6,padding:'8px 0',color:C.d,fontSize:9,letterSpacing:'2px'}}>EDIT</button></div>`}</div>`;}
+
+  function Vault(){
+    var fil=vault.filter(function(e){return e.label.toLowerCase().includes(vSearch.toLowerCase())||e.user.toLowerCase().includes(vSearch.toLowerCase());});
+    return html`<div style=${{flex:1,display:'flex',flexDirection:'column',padding:12,gap:8}}>
+      <div style=${{display:'flex',justifyContent:'space-between',alignItems:'center',flexShrink:0}}>
+        <div style=${{fontSize:9,color:C.d,letterSpacing:'3px'}}>VAULT · ${vault.length} · local</div>
+        <button onClick=${function(){setVView(function(v){return v==='list'?'add':'list';});}} style=${{background:vView==='add'?C.p+'22':C.card,border:'1px solid '+(vView==='add'?C.p+'44':C.border),borderRadius:6,padding:'4px 10px',color:C.p,fontSize:9,letterSpacing:'1px'}}>${vView==='add'?'✕ CANCEL':'+ ADD'}</button></div>
+      ${vView==='add'?html`<div style=${{background:C.card,border:'1px solid '+C.border,borderRadius:10,padding:12,display:'flex',flexDirection:'column',gap:8}}>
+        <div style=${{fontSize:9,color:C.d,letterSpacing:'2px'}}>NEW ENTRY</div>
+        ${[['text','LABEL',vNew.label,function(v){setVNew(function(n){return Object.assign({},n,{label:v});});}],['text','USERNAME',vNew.user,function(v){setVNew(function(n){return Object.assign({},n,{user:v});});}],['password','PASSWORD',vNew.pass,function(v){setVNew(function(n){return Object.assign({},n,{pass:v});})}]].map(function(x){return html`<input key=${x[1]} type=${x[0]} placeholder=${x[1]} value=${x[2]} onInput=${function(e){x[3](e.target.value);}} style=${{background:'transparent',border:'1px solid '+C.border,borderRadius:6,padding:'7px 10px',color:C.p,fontSize:11,outline:'none',caretColor:C.p}}/>`;})}</p>
+        <div style=${{display:'flex',gap:6}}>
+          <button onClick=${function(){setVNew(function(n){return Object.assign({},n,{pass:gP(16)});});}} style=${{background:C.card,border:'1px solid '+C.border,borderRadius:6,padding:'7px 10px',color:C.d,fontSize:9}}>⚿ GEN</button>
+          <button onClick=${function(){if(!vNew.label||!vNew.pass)return;setVault(function(e){return e.concat([Object.assign({id:Date.now()},vNew,{show:false})]);});setVNew({label:'',user:'',pass:''});setVView('list');}} style=${{flex:1,background:C.p+'18',border:'1px solid '+C.p+'44',borderRadius:6,padding:'7px 0',color:C.p,fontSize:9,letterSpacing:'2px'}}>SAVE</button></div></div>`:html`
+        <input placeholder="search..." value=${vSearch} onInput=${function(e){setVSearch(e.target.value);}} style=${{background:C.card,border:'1px solid '+C.border,borderRadius:7,padding:'7px 10px',color:C.p,fontSize:11,outline:'none',caretColor:C.p,flexShrink:0}}/>
+        <div style=${{flex:1,overflowY:'auto',display:'flex',flexDirection:'column',gap:6}}>
+          ${fil.length===0&&html`<div style=${{color:C.dim,fontSize:10,textAlign:'center',marginTop:20}}>NO ENTRIES</div>`}
+          ${fil.map(function(e){return html`<div key=${e.id} style=${{background:C.card,border:'1px solid '+C.border,borderRadius:10,padding:'10px 12px'}}>
+            <div style=${{display:'flex',justifyContent:'space-between',marginBottom:5}}>
+              <span style=${{color:C.p,fontSize:12,fontWeight:700}}>${e.label}</span>
+              <button onClick=${function(){setVault(function(v){return v.filter(function(x){return x.id!==e.id;});});}} style=${{background:'none',color:C.dim,fontSize:12}}>✕</button></div>
+            ${e.user&&html`<div style=${{display:'flex',justifyContent:'space-between',marginBottom:4}}>
+              <span style=${{color:C.d,fontSize:9,maxWidth:170,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>${e.user}</span>
+              <button onClick=${function(){cp(e.user);}} style=${{background:'none',color:C.dim,fontSize:8}}>COPY</button></div>`}
+            <div style=${{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+              <span style=${{color:C.d,fontSize:9,filter:e.show?'none':'blur(3.5px)',transition:'filter .2s',maxWidth:155,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>${e.pass}</span>
+              <div style=${{display:'flex',gap:5,flexShrink:0}}>
+                <button onClick=${function(){setVault(function(v){return v.map(function(x){return x.id===e.id?Object.assign({},x,{show:!x.show}):x;});});}} style=${{background:'none',color:C.dim,fontSize:8}}>${e.show?'HIDE':'SHOW'}</button>
+                <button onClick=${function(){cp(e.pass);}} style=${{background:'none',color:C.d,fontSize:8}}>COPY</button></div></div></div>`;})}</div>`}</div>`;}
+
+  function Tidy(){
+    function TA(props){return html`<div style=${{marginBottom:10}}>
+      <div style=${{fontSize:9,color:C.d,letterSpacing:'2px',marginBottom:4}}>${props.label}</div>
+      <textarea rows="3" placeholder=${props.ph} onInput=${function(e){props.onCh(e.target.value);}}
+        style=${{width:'100%',resize:'none',background:'transparent',border:'1px solid '+C.border,borderRadius:6,padding:'7px 9px',color:C.p,fontSize:10,lineHeight:1.5,outline:'none',caretColor:C.p}}>${props.val}</textarea></div>`;}
+    return html`<div style=${{flex:1,display:'flex',flexDirection:'column',padding:12,overflowY:'auto'}}>
+      <div style=${{fontSize:9,color:C.d,letterSpacing:'3px',marginBottom:10}}>DIGITAL TIDY · ${dStr()}</div>
+      <${TA} label="TAB GRAVEYARD" ph=${'reddit tab 3 days ago\nold figma prototype'} val=${tt} onCh=${setTT}/>
+      <${TA} label="DUPLICATE SUSPECTS" ph=${'3x eyecode-mvp folders\n2x scraper repos'} val=${td} onCh=${setTD}/>
+      <${TA} label="OPEN LOOPS" ph=${'lemon squeezy pending\nhavent pushed to github'} val=${tl} onCh=${setTL}/>
+      <button onClick=${function(){setBForm(function(f){return Object.assign({},f,{loops:tl||f.loops,blockers:td||f.blockers});});go('brief');}} style=${{background:C.p+'14',border:'1px solid '+C.p+'44',borderRadius:8,padding:'10px 0',color:C.p,fontSize:10,letterSpacing:'2px',marginBottom:14}}>↓ SEND TO BRIEF</button>
+      <div style=${{background:C.card,border:'1px solid '+C.border,borderRadius:10,padding:12}}>
+        <div style=${{fontSize:9,color:C.d,letterSpacing:'2px',marginBottom:8}}>CAPABILITY MAP</div>
+        ${[['✓','Manual tidy + hygiene log'],['✓','AI brief from tidy data'],['✓','Data persists locally'],['✗','Auto-close tabs (browser security)'],['✗','Filesystem scan (needs native)']].map(function(x){return html`<div key=${x[1]} style=${{display:'flex',gap:8,padding:'4px 0',borderBottom:'1px solid '+C.border,fontSize:9}}>
+          <span style=${{color:x[0]==='✓'?C.p:C.dim,flexShrink:0}}>${x[0]}</span>
+          <span style=${{color:x[0]==='✓'?C.d:C.dim}}>${x[1]}</span></div>`;})}</div></div>`;}
+
+  function Della(){
+    var CHIPS=['status','deploy','stop','watcher'];
+    return html`<div style=${{flex:1,display:'flex',flexDirection:'column',padding:12,minHeight:0}}>
+      <div style=${{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:8,flexShrink:0}}>
+        <div style=${{fontSize:9,color:C.d,letterSpacing:'3px'}}>DELLA · --force ./buildyou</div>
+        <div style=${{fontSize:8,letterSpacing:'1px',color:dBridge.indexOf('up')===0?C.p:'#ff4d6d'}}>${dBridge.indexOf('up')===0?'● bridge up':dBridge==='down'?'● bridge down':'checking…'}</div></div>
+      <div style=${{flex:1,background:C.card,border:'1px solid '+C.border,borderRadius:10,padding:10,overflowY:'auto',fontSize:10,lineHeight:1.7,marginBottom:8,minHeight:0}}>
+        ${dLog.map(function(l,i){return html`<div key=${i} style=${{color:l.k==='ok'?C.p:l.k==='err'?'#ff4d6d':l.k==='prompt'?C.p:C.dim,wordBreak:'break-word'}}>${l.t}</div>`;})}</div>
+      <div style=${{display:'flex',gap:6,marginBottom:8,flexWrap:'wrap'}}>
+        ${CHIPS.map(function(c){return html`<button key=${c} onClick=${function(){runDella(c);}} style=${{background:C.card,border:'1px solid '+C.border,borderRadius:16,padding:'4px 10px',color:C.d,fontSize:9}}>${c}</button>`;})}</div>
+      <div style=${{display:'flex',alignItems:'center',gap:8,background:C.card,border:'1px solid '+C.border,borderRadius:8,padding:'7px 12px',flexShrink:0}}>
+        <span style=${{color:C.p,fontSize:13,fontWeight:700}}>❯</span>
+        <input value=${dCmd} onInput=${function(e){setDCmd(e.target.value);}}
+          onKeyDown=${function(e){if(e.key==='Enter'&&dCmd.trim()){runDella(dCmd.trim());setDCmd('');}}}
+          placeholder="type a command…" style=${{flex:1,background:'transparent',border:'none',outline:'none',color:C.p,fontSize:11,caretColor:C.p}}/>
+        <button onClick=${function(){if(dCmd.trim()){runDella(dCmd.trim());setDCmd('');}}} style=${{background:C.p+'18',border:'1px solid '+C.p+'44',borderRadius:6,padding:'5px 9px',color:C.p,fontSize:9,letterSpacing:'1px'}}>RUN</button></div></div>`;}
+
+  function Prefs(){
+    async function rN(){try{var p=await Notification.requestPermission();setNPerm(p);}catch(e){setNPerm('unavailable');}}
+    return html`<div style=${{flex:1,padding:14,overflowY:'auto'}}>
+      <div style=${{fontSize:9,color:C.d,letterSpacing:'3px',marginBottom:16}}>PREFERENCES</div>
+      <div style=${{fontSize:9,color:C.d,letterSpacing:'2px',marginBottom:8}}>THEME</div>
+      <div style=${{display:'flex',flexDirection:'column',gap:6,marginBottom:18}}>
+        ${Object.entries(TH).map(function(entry){var n=entry[0],t=entry[1];return html`<button key=${n} onClick=${function(){setTheme(n);}} style=${{background:theme===n?t.p+'15':C.card,border:'1px solid '+(theme===n?t.p+'55':C.border),borderRadius:8,padding:'10px 14px',display:'flex',alignItems:'center',justifyContent:'space-between'}}>
+          <span style=${{color:t.p,fontSize:12,letterSpacing:'2px'}}>${n==='cf'?'❯ CF  —  default':n.toUpperCase()}</span>
+          <div style=${{width:14,height:14,borderRadius:'50%',background:t.p,boxShadow:'0 0 8px '+t.p}}/></button>`;})}</div>
+      <div style=${{fontSize:9,color:C.d,letterSpacing:'2px',marginBottom:8}}>PERMISSIONS</div>
+      <div style=${{background:C.card,border:'1px solid '+C.border,borderRadius:10,padding:12,marginBottom:16}}>
+        <div style=${{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+          <div>
+            <div style=${{color:C.p,fontSize:11}}>Notifications</div>
+            <div style=${{color:C.dim,fontSize:8,marginTop:1}}>${nPerm==='granted'?'✓ enabled':nPerm==='denied'?'✗ blocked':'enable for tidy reminders'}</div></div>
+          <button onClick=${rN} disabled=${nPerm==='granted'||nPerm==='denied'} style=${{background:nPerm==='granted'?C.p+'18':C.card,border:'1px solid '+(nPerm==='granted'?C.p+'44':C.border),borderRadius:6,padding:'5px 10px',color:nPerm==='granted'?C.p:C.d,fontSize:9,letterSpacing:'1px'}}>${nPerm==='granted'?'ON':'REQUEST'}</button></div></div>
+      <div style=${{fontSize:9,color:C.d,letterSpacing:'2px',marginBottom:8}}>SESSION</div>
+      <div style=${{background:C.card,border:'1px solid '+C.border,borderRadius:8,padding:12,fontSize:11}}>
+        ${[['Energy',nrg],['Focus sessions',sess],['Vault entries',vault.length],['Brain dump',dump.length+' chars'],['Briefs saved',bHist.length]].map(function(x){return html`<div key=${x[0]} style=${{display:'flex',justifyContent:'space-between',padding:'6px 0',borderBottom:'1px solid '+C.border}}>
+          <span style=${{color:C.d}}>${x[0]}</span><span style=${{color:C.p}}>${x[1]}</span></div>`;})}</div>
+      <div style=${{marginTop:20,textAlign:'center',display:'flex',flexDirection:'column',alignItems:'center',gap:6}}>
+        <${Sprite} px=${4}/>
+        <div style=${{fontSize:9,color:C.d,letterSpacing:'2px'}}>CreativeFactory.studio</div>
+        <div style=${{fontSize:8,color:C.dim,opacity:.5,letterSpacing:'3px'}}>--force ./buildyou</div></div></div>`;}
+
+  var AMAP={focus:html`<${Focus}/>`,dump:html`<${Dump}/>`,brief:html`<${Brief}/>`,vault:html`<${Vault}/>`,tidy:html`<${Tidy}/>`,della:html`<${Della}/>`,prefs:html`<${Prefs}/>`};
+
+  return html`<div style=${{minHeight:'100vh',background:'#010102',display:'flex',alignItems:'center',justifyContent:'center',padding:20}}>
+    <style>::-webkit-scrollbar-thumb{background:${C.border}}input::placeholder,textarea::placeholder{color:${C.dim};opacity:1}</style>
+    <div style=${{width:320,minHeight:640,background:C.bg,border:'1.5px solid '+C.border,borderRadius:42,overflow:'hidden',display:'flex',flexDirection:'column',position:'relative',
+      boxShadow:'0 0 0 4px #040404,0 0 0 5.5px #0a0a0a,0 32px 80px rgba(0,0,0,.9),0 0 60px '+C.p+'08,inset 0 0 40px rgba(0,0,0,.3)'}}>
+      <div style=${{position:'absolute',top:14,left:'50%',transform:'translateX(-50%)',width:22,height:6,borderRadius:3,background:'#070707',zIndex:20}}/>
+      <div style=${{position:'absolute',inset:0,zIndex:15,pointerEvents:'none',borderRadius:42,background:'repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.05) 2px,rgba(0,0,0,.05) 3px)'}}/>
+      <div style=${{position:'absolute',inset:0,zIndex:14,pointerEvents:'none',borderRadius:42,background:'radial-gradient(ellipse at center,transparent 55%,rgba(0,0,0,.6) 100%)'}}/>
+      <div style=${{paddingTop:32,display:'flex',flexDirection:'column',flex:1,position:'relative',zIndex:1,minHeight:0}}>
+        ${screen!=='boot'&&html`<${Bar}/>`}
+        <div style=${{flex:1,display:'flex',flexDirection:'column',minHeight:0}}>
+          ${screen==='boot'&&html`<${Boot}/>`}
+          ${screen==='home'&&html`<${Home}/>`}
+          ${screen==='app'&&app&&AMAP[app]}</div>
+        ${(screen==='home'||screen==='app')&&html`<${Nav}/>`}</div></div>
+    <div style=${{position:'fixed',bottom:12,left:'50%',transform:'translateX(-50%)',fontSize:9,color:'#111',letterSpacing:'2px',whiteSpace:'nowrap'}}>❯ y_ · CreativeFactory.studio</div></div>`;}
+
+pRender(html`<${App}/>`, document.getElementById('root'));
+</script>
+<script>
+if('serviceWorker'in navigator){
+  var sw="const V='cfb-v4';self.addEventListener('install',e=>{self.skipWaiting();e.waitUntil(caches.open(V).then(c=>c.add('/')));});self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==V).map(k=>caches.delete(k))))));self.addEventListener('fetch',e=>e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request).catch(()=>caches.match('/')))));";
+  var b=new Blob([sw],{type:'application/javascript'});
+  navigator.serviceWorker.register(URL.createObjectURL(b)).catch(function(){});
+}
+</script>
+</body>
+</html>
