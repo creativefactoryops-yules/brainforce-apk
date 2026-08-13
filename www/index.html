@@ -13,8 +13,8 @@
   --mist:#c8d8c0; --white:#f0f4f0; --dim:#6a7870;
   --mono:'JetBrains Mono', monospace; --sans:'Space Grotesk', sans-serif;
 }
-html,body{height:100%;background:var(--black);color:var(--white);font-family:var(--sans);overflow:hidden;}
-#app{position:relative;width:100%;height:100%;overflow:hidden;}
+html,body{height:100%;height:100dvh;background:var(--black);color:var(--white);font-family:var(--sans);overflow:hidden;}
+#app{position:relative;width:100%;height:100%;overflow:hidden;padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom);padding-left:env(safe-area-inset-left);padding-right:env(safe-area-inset-right);}
 .view{position:absolute;inset:0;overflow-y:auto;-webkit-overflow-scrolling:touch;}
 .view.hidden{display:none;}
 
@@ -57,7 +57,7 @@ html,body{height:100%;background:var(--black);color:var(--white);font-family:var
 .app-tile{display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;user-select:none;}
 .app-tile:active{transform:scale(.94);}
 .app-icon{width:48px;height:48px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:19px;font-weight:700;background:var(--surface);border:1px solid var(--border);}
-.app-label{font-family:var(--mono);font-size:11px;text-align:center;line-height:1.2;color:var(--mist);}
+.app-label{font-family:var(--mono);font-size:11px;text-align:center;line-height:1.25;color:var(--mist);overflow-wrap:anywhere;word-break:break-word;max-width:70px;}
 .app-tile.hidden{display:none;}
 .app-tile.featured .app-icon{border-color:var(--acid);box-shadow:0 0 0 1px rgba(181,255,77,.15),0 0 14px rgba(181,255,77,.1);}
 .app-tile.featured .app-label{color:var(--acid);}
@@ -66,11 +66,11 @@ html,body{height:100%;background:var(--black);color:var(--white);font-family:var
 #gridForgeView{background:var(--black);}
 .forge-header{position:sticky;top:0;z-index:15;background:var(--deep);border-bottom:1px solid var(--border);padding:14px 16px;}
 .forge-header::before{content:'';display:block;position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--moss-light),var(--acid),transparent);}
-.header-row{display:flex;align-items:center;gap:10px;margin-top:14px;}
+.header-row{display:flex;align-items:center;gap:10px;margin-top:14px;flex-wrap:wrap;}
 .back-btn{width:30px;height:30px;border-radius:4px;border:1px solid var(--border);background:var(--surface);color:var(--mist);font-size:16px;display:flex;align-items:center;justify-content:center;flex:none;font-family:var(--mono);}
-.forge-title{font-family:var(--mono);font-size:14px;font-weight:700;color:var(--white);}
-.forge-sub{font-size:10px;color:var(--dim);font-family:var(--mono);}
-.status-chip{margin-left:auto;font-size:10px;padding:4px 8px;border-radius:3px;border:1px solid var(--border);color:var(--moss-light);font-family:var(--mono);white-space:nowrap;}
+.forge-title{font-family:var(--mono);font-size:14px;font-weight:700;color:var(--white);overflow-wrap:anywhere;min-width:0;}
+.forge-sub{font-size:10px;color:var(--dim);font-family:var(--mono);overflow-wrap:anywhere;}
+.status-chip{margin-left:auto;font-size:10px;padding:4px 8px;border-radius:3px;border:1px solid var(--border);color:var(--moss-light);font-family:var(--mono);white-space:nowrap;flex:none;}
 
 .forge-body{padding:16px;max-width:560px;margin:0 auto;padding-bottom:60px;}
 .chamber{border:1px solid var(--border);border-radius:4px;background:var(--surface);padding:14px;margin-bottom:16px;}
@@ -80,7 +80,7 @@ html,body{height:100%;background:var(--black);color:var(--white);font-family:var
 .drop-zone img{max-width:100%;max-height:150px;border-radius:4px;}
 .drop-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;}
 
-.controls-row{display:flex;gap:10px;margin-top:14px;}
+.controls-row{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap;}
 .control-group{flex:1;}
 .control-label{display:block;font-size:9.5px;color:var(--dim);letter-spacing:.5px;margin-bottom:5px;text-transform:uppercase;font-family:var(--mono);}
 .forge-select{width:100%;padding:9px;border-radius:4px;border:1px solid var(--border);background:var(--deep);color:var(--white);font-family:var(--mono);font-size:12.5px;}
@@ -102,7 +102,7 @@ html,body{height:100%;background:var(--black);color:var(--white);font-family:var
 .tile-dl{position:absolute;bottom:0;left:0;right:0;background:rgba(8,11,15,.85);color:var(--mist);font-size:9px;text-align:center;padding:4px 0;opacity:0;transition:opacity .15s;font-family:var(--mono);}
 .grid-tile:active .tile-dl{opacity:1;}
 
-.download-row{display:flex;gap:10px;margin-top:14px;}
+.download-row{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap;}
 .order-strip{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;}
 .order-chip{font-size:10.5px;padding:5px 8px;border-radius:3px;background:var(--surface);border:1px solid var(--border);color:var(--moss-light);font-family:var(--mono);}
 .readme-note{margin-top:16px;font-family:var(--mono);font-size:10px;color:var(--dim);text-align:center;}
@@ -127,6 +127,56 @@ html,body{height:100%;background:var(--black);color:var(--white);font-family:var
 
 .toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%);background:var(--surface);border:1px solid var(--moss-light);color:var(--white);padding:10px 16px;border-radius:4px;font-family:var(--mono);font-size:12px;z-index:99;opacity:0;pointer-events:none;transition:opacity .25s, transform .25s;}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(-6px);}
+
+/* ── TERMDOOR ── */
+.td-tabs{display:flex;gap:6px;margin-bottom:16px;}
+.td-tab{flex:1;background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:8px 10px;color:var(--dim);font-family:var(--mono);font-size:11px;letter-spacing:.5px;cursor:pointer;text-align:center;white-space:normal;}
+.td-tab.on{background:rgba(181,255,77,.1);border-color:var(--acid);color:var(--acid);}
+.td-sec{display:none;} .td-sec.on{display:block;}
+.td-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;background:var(--border);border:1px solid var(--border);border-radius:4px;overflow:hidden;margin-bottom:14px;}
+.td-tile{aspect-ratio:1;position:relative;cursor:pointer;background:var(--deep);}
+.td-tile canvas{width:100%;height:100%;display:block;}
+.td-tile.picked{box-shadow:inset 0 0 0 2px var(--acid);}
+.td-editor{border:1px solid var(--border);border-radius:4px;background:var(--surface);padding:14px;margin-bottom:14px;}
+.td-editor label{display:block;font-size:9.5px;color:var(--dim);letter-spacing:.5px;margin-bottom:5px;text-transform:uppercase;font-family:var(--mono);margin-top:10px;}
+.td-editor label:first-child{margin-top:0;}
+.td-editor input,.td-editor textarea{width:100%;padding:9px;border-radius:4px;border:1px solid var(--border);background:var(--deep);color:var(--white);font-family:var(--mono);font-size:12px;resize:vertical;overflow-wrap:anywhere;}
+.td-row2{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;}
+.td-row2 .forge-btn{min-width:130px;}
+.td-row2 .forge-btn{padding:9px;font-size:11px;}
+.td-accents{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px;}
+.td-accent{width:26px;height:26px;border-radius:5px;border:1.5px solid var(--border);cursor:pointer;flex:none;}
+.td-accent.on{border-color:var(--white);box-shadow:0 0 0 1px var(--white);}
+.td-toggle-row{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:14px;padding-top:12px;border-top:1px solid var(--border);}
+.td-toggle-row span{font-family:var(--mono);font-size:11px;color:var(--mist);overflow-wrap:anywhere;}
+.td-switch{width:40px;height:22px;border-radius:11px;background:var(--deep);border:1px solid var(--border);position:relative;cursor:pointer;flex:none;}
+.td-switch.on{background:rgba(181,255,77,.25);border-color:var(--acid);}
+.td-switch::after{content:'';position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:var(--dim);transition:transform .15s;}
+.td-switch.on::after{background:var(--acid);transform:translateX(18px);}
+.td-photo-input{display:none;}
+.td-cap-card{background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:12px;margin-bottom:10px;}
+.td-cap-head{display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap;}
+.td-cap-wk{font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:1px;}
+.td-cap-tiles{font-family:var(--mono);font-size:9px;color:var(--dim);margin-left:auto;}
+.td-cap-text{font-family:var(--mono);font-size:11.5px;color:var(--mist);line-height:1.6;overflow-wrap:anywhere;white-space:pre-wrap;}
+.td-cap-copy{margin-top:8px;font-family:var(--mono);font-size:10px;color:var(--moss-light);border:1px solid var(--border);border-radius:4px;padding:6px 10px;display:inline-block;cursor:pointer;}
+
+/* ── small / older phones (≤340px wide) ── */
+@media (max-width:340px){
+  .home-inner{padding:12px 12px 90px;}
+  .forge-body{padding:12px;}
+  .app-grid{gap:16px 4px;}
+  .app-icon{width:42px;height:42px;font-size:17px;}
+  .app-label{font-size:10px;max-width:60px;}
+  .hero{padding:16px 14px;}
+  .sticker-card canvas{width:44px;height:70px;}
+  .squad-grid{gap:6px;}
+}
+
+/* ── tablets / large screens: keep it phone-sized and centered ── */
+@media (min-width:720px){
+  .home-inner,.forge-body{max-width:480px;}
+}
 </style>
 </head>
 <body>
@@ -278,6 +328,124 @@ html,body{height:100%;background:var(--black);color:var(--white);font-family:var
       <div class="della-sec" id="dsec-care">
         <div class="section-label">// self care · for the builders who forget</div>
         <div id="careList"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ TERMDOOR ============ -->
+  <div id="termdoorView" class="view hidden">
+    <div class="forge-header">
+      <div class="term-chrome">
+        <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+        <span class="term-title">~/buildyou/termdoor — bash</span>
+      </div>
+      <div class="header-row">
+        <button class="back-btn" id="tdBackBtn">‹</button>
+        <div><div class="forge-title">termdoor</div><div class="forge-sub">18-tile grid · della hides here</div></div>
+        <div class="status-chip" id="tdStatus">tile 1/18</div>
+      </div>
+    </div>
+
+    <div class="forge-body">
+      <div class="td-tabs">
+        <div class="td-tab on" data-tdtab="grid">❯ the grid</div>
+        <div class="td-tab" data-tdtab="captions">✎ post captions</div>
+      </div>
+
+      <div class="td-sec on" id="tdsec-grid">
+        <div class="td-grid" id="tdGrid"></div>
+
+        <div class="td-editor" id="tdEditor">
+          <label>tile <span id="tdTileNum">1</span> · type</label>
+          <select class="forge-select" id="tdType">
+            <option value="term">terminal output</option>
+            <option value="brand">brand statement</option>
+            <option value="quote">quote</option>
+            <option value="count">counter</option>
+            <option value="photo">your photo</option>
+          </select>
+
+          <div id="tdTextFields">
+            <label>command line</label>
+            <input id="tdCmd" placeholder="$ whoami">
+            <label>lines (one per row)</label>
+            <textarea id="tdOut" rows="3" placeholder="line one&#10;line two"></textarea>
+          </div>
+
+          <label>accent color</label>
+          <div class="td-accents" id="tdAccents"></div>
+
+          <div class="td-row2">
+            <button class="forge-btn" id="tdPhotoBtn">📷 upload photo for this tile</button>
+            <input type="file" id="tdPhotoInput" class="td-photo-input" accept="image/*">
+          </div>
+
+          <div class="td-toggle-row">
+            <span>👀 hide della — the grid bandit — in this tile</span>
+            <div class="td-switch" id="tdDellaSwitch"></div>
+          </div>
+
+          <div class="td-row2" style="margin-top:14px;">
+            <button class="forge-btn" id="tdSaveTileBtn">⬇ save this tile</button>
+            <button class="forge-btn secondary" id="tdResetTileBtn">rm -rf tile</button>
+          </div>
+        </div>
+
+        <div class="download-row">
+          <button class="forge-btn" id="tdExportAllBtn">⬇ export all 18 (post order)</button>
+        </div>
+        <div class="readme-note">// tiles saved to your downloads folder · post bottom-to-top so the grid builds top-down on your profile</div>
+      </div>
+
+      <div class="td-sec" id="tdsec-captions" style="margin-top:16px;"></div>
+    </div>
+  </div>
+
+  <!-- ============ MISSION ============ -->
+  <div id="missionView" class="view hidden">
+    <div class="forge-header">
+      <div class="term-chrome">
+        <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+        <span class="term-title">~/buildyou/mission — bash</span>
+      </div>
+      <div class="header-row">
+        <button class="back-btn" id="missionBackBtn">‹</button>
+        <div><div class="forge-title">mission</div><div class="forge-sub">why --force ./buildyou exists</div></div>
+      </div>
+    </div>
+
+    <div class="forge-body">
+      <div class="chamber" style="border-color:#c8ff0055;">
+        <div class="chamber-label" style="color:#c8ff00;">$ mission</div>
+        <div style="font-family:var(--mono);font-size:13px;line-height:1.8;color:var(--white);overflow-wrap:anywhere;">
+          create systems that allow for a more inclusive industry — all while learning and building in public, until I build for the public.
+        </div>
+      </div>
+
+      <div class="chamber" style="border-color:#00e5ff55;">
+        <div class="chamber-label" style="color:#00e5ff;">❯ the essence</div>
+        <div style="font-family:var(--mono);font-size:13px;line-height:1.8;color:var(--mist);overflow-wrap:anywhere;">
+          purpose. growth. being of service to my own community. believing you can teach yourself something you thought you were never smart enough, or focused enough, or built right for.
+        </div>
+      </div>
+
+      <div class="chamber" style="border-color:#ffb70055;">
+        <div class="chamber-label" style="color:#ffb700;">// the reframe</div>
+        <div style="font-family:var(--mono);font-size:13px;line-height:1.8;color:var(--mist);overflow-wrap:anywhere;">
+          maybe building was never meant for some brains. that's precisely why those brains are the ones who have to build the tools they deserve — so their energy goes to the best part: to BUILD.
+        </div>
+      </div>
+
+      <div class="chamber" style="border-color:#ff6b3555;">
+        <div class="chamber-label" style="color:#ff6b35;">$ whoami --brand</div>
+        <div style="font-family:var(--mono);font-size:13px;line-height:1.8;color:var(--mist);overflow-wrap:anywhere;">
+          tools not toys. accessibility for all. terminal commands as the interface — built for neurodivergence, built through my own executive dysfunction, not around it.
+        </div>
+      </div>
+
+      <div class="chamber" style="border-color:#b79cff55;text-align:center;">
+        <div style="font-family:var(--mono);font-size:11px;color:var(--dim);letter-spacing:1px;margin-bottom:8px;">rm -rf self doubt &amp;&amp; deploy</div>
+        <div style="font-family:var(--mono);font-weight:800;font-size:22px;color:var(--acid);">--force<br>./buildyou</div>
       </div>
     </div>
   </div>
@@ -444,7 +612,8 @@ document.querySelectorAll('.della-tab').forEach(btn=>{
 const apps = [
   {label:'grid_forge', tag:'⚒', color:'var(--acid)', featured:true, action:()=>openGridForge()},
   {label:'della_squad', tag:'☆', color:'var(--acid)', featured:true, action:()=>openDellaView()},
-  {label:'the_della_effect', tag:'✦', color:'var(--moss-light)', featured:true, action:()=>openExternal('https://react-9bubnc.onspace.build/')},
+  {label:'termdoor', tag:'▦', color:'var(--acid)', featured:true, action:()=>openTermdoor()},
+  {label:'mission', tag:'$', color:'var(--acid)', featured:true, action:()=>openMission()},
   {label:'chrome', tag:'◎'}, {label:'settings', tag:'⚙'}, {label:'play store', tag:'▷'},
   {label:'maps', tag:'⌖'}, {label:'messages', tag:'✉'}, {label:'photos', tag:'▣'},
   {label:'meet', tag:'▮'}, {label:'gmail', tag:'✎'}, {label:'youtube', tag:'▶'},
@@ -471,12 +640,302 @@ function openExternal(url){
 }
 
 /* ============ VIEW SWITCHING ============ */
-function openGridForge(){ document.getElementById('homeScreen').classList.add('hidden'); document.getElementById('dellaView').classList.add('hidden'); document.getElementById('gridForgeView').classList.remove('hidden'); notifyNative('grid'); }
-function openDellaView(){ document.getElementById('homeScreen').classList.add('hidden'); document.getElementById('gridForgeView').classList.add('hidden'); document.getElementById('dellaView').classList.remove('hidden'); notifyNative('della'); renderDellaView(); }
-function goHome(){ document.getElementById('gridForgeView').classList.add('hidden'); document.getElementById('dellaView').classList.add('hidden'); document.getElementById('homeScreen').classList.remove('hidden'); notifyNative('home'); }
+const ALL_VIEWS = ['homeScreen','gridForgeView','dellaView','termdoorView','missionView'];
+function showView(id){ ALL_VIEWS.forEach(v=>document.getElementById(v).classList.toggle('hidden', v!==id)); }
+function openGridForge(){ showView('gridForgeView'); notifyNative('grid'); }
+function openDellaView(){ showView('dellaView'); notifyNative('della'); renderDellaView(); }
+function openTermdoor(){ showView('termdoorView'); notifyNative('termdoor'); renderTermdoor(); }
+function openMission(){ showView('missionView'); notifyNative('mission'); }
+function goHome(){ showView('homeScreen'); notifyNative('home'); }
 document.getElementById('backBtn').addEventListener('click', goHome);
 document.getElementById('dellaBackBtn').addEventListener('click', goHome);
+document.getElementById('tdBackBtn').addEventListener('click', goHome);
+document.getElementById('missionBackBtn').addEventListener('click', goHome);
 window.goHome = goHome;
+
+/* ============ TERMDOOR ============ */
+const TD_COLORS = ['#c8ff00','#00e5ff','#ff6b35','#b79cff','#ff9ec8','#ffb700','#f0f4f0','#6a7870'];
+
+// 18 tiles, 6 rows x 3 cols — ported from THE_TERMDOOR manifest
+const TD_TILES = [
+  {type:'brand', main:'❯ y_', out:['CreativeFactory','.studio'], accent:'#c8ff00'},
+  {type:'brand', main:'rm -rf\ndoubt', out:['the command that','runs first'], accent:'#c8ff00'},
+  {type:'brand', main:'ADHD\nsolo\n2am', out:['Toronto · Termux'], accent:'#c8ff00'},
+
+  {type:'term', cmd:'$ whoami', out:['user: yules','role: indie maker','shell: bash'], accent:'#c8ff00'},
+  {type:'term', cmd:'$ uname -a', out:['OS: ADHD v1.0','CPU: hyperfocus','RAM: always full'], accent:'#c8ff00'},
+  {type:'term', cmd:'$ pwd', out:['/home/cf','→ the grid','→ come in'], accent:'#c8ff00'},
+
+  {type:'term', cmd:'$ ls tools/', out:['◉ CF-BRAIN/','▤ eyecode.exe','⌘ Grid_Forge/'], accent:'#c8ff00'},
+  {type:'term', cmd:'$ ls more/', out:['★ della/','❯ buildyou.sh','⚿ keygen.sh'], accent:'#c8ff00'},
+  {type:'term', cmd:'$ cat readme', out:['all tools are real.','all live. all ship.','none are promises.'], accent:'#c8ff00'},
+
+  {type:'term', cmd:'$ find . -name della', out:['searching...','......',"// she's close"], accent:'#c8ff00'},
+  {type:'term', cmd:'// 👀', out:['comment 👀','if spotted','grid bandit'], accent:'#c8ff00', della:true},
+  {type:'term', cmd:'$ cat /home/della', out:['she lives here.','builds here.','alone in the grid.'], accent:'#c8ff00'},
+
+  {type:'term', cmd:'$ crontab -l', out:['0 2 * * * build','0 3 * * * ship','# della watches'], accent:'#c8ff00'},
+  {type:'quote', main:'"built everything\nbefore the\nfirst post."', out:[], accent:'#c8ff00'},
+  {type:'term', cmd:'$ ./enter', out:['welcome.',"follow if you're","also alone here."], accent:'#c8ff00'},
+
+  {type:'term', cmd:'$ ./della_effect', out:['--start','--weeks 6','--owners 6'], accent:'#ffb700'},
+  {type:'count', main:'6 WEEKS', out:['the effect','begins soon'], accent:'#ffb700'},
+  {type:'term', cmd:'$ tail -f log', out:['[WK1] pending','[WK6] finale','// standby'], accent:'#ffb700'},
+];
+
+const TD_PLAN = [
+  {wk:'WK 0', label:'TODAY', col:'#c8ff00', tiles:'tiles 1–3', row:'Row 1 · The Door Frame', cap:"I built everything before the first post. this is the door. come in. ❯ y_"},
+  {wk:'WK 1', label:'della_init', col:'#c8ff00', tiles:'tiles 4–6', row:'Row 2 · whoami', cap:'$ whoami // user: yules // solo ADHD indie maker // 2am deploys // Termux // this is the grid forge.'},
+  {wk:'WK 2', label:'della_focus', col:'#00e5ff', tiles:'tiles 7–9', row:'Row 3 · ls tools', cap:'$ ls tools/ // six of them. all live. all real. none are promises. swipe for names and links.'},
+  {wk:'WK 3', label:'della_build', col:'#ff6b35', tiles:'tiles 10–12', row:'Row 4 · della hides here', cap:'somewhere in tile 11 of this grid, della is hiding. she does this. comment 👀 if you spot the grid bandit. ♡'},
+  {wk:'WK 4', label:'della_debug', col:'#b79cff', tiles:'tiles 13–15', row:'Row 5 · The Build Life', cap:'"I built everything before the first post." // 2am. Termux. Netlify. ADHD. alone. still shipping.'},
+  {wk:'WK 5', label:'della_rest', col:'#ff9ec8', tiles:'tiles 16–18', row:'Row 6 · della effect teaser', cap:'6 weeks. 6 commands. 6 owners. the della effect begins week 6. // standby.'},
+];
+
+// pixel sprite for della peeking — separate palette from the home mascot, matches the manifest art
+const TD_F0=['___RRRRRRRR___','__RRRrrrrRR___','___RSSSSSSR___','____SSSSSS____','____SEESEE____','____SGWSGW____','____SSSSSS____','____SpSSpS____','____SSmmSS____','____SSSSSS____'];
+const TD_PAL={_:null,S:'#fdd9b5',E:'#1a1028',W:'#fff',p:'#ff9898',m:'#cc4040',G:'#c8ff00',R:'#f21428',r:'#8c0a18'};
+function drawTdSprite(cv, px){
+  const ctx = cv.getContext('2d'); ctx.clearRect(0,0,cv.width,cv.height);
+  TD_F0.forEach((row,ri)=>row.split('').forEach((ch,ci)=>{
+    const col = TD_PAL[ch];
+    if(col){ ctx.fillStyle=col; ctx.fillRect(ci*px, ri*px, px, px); }
+  }));
+}
+
+let tdSelected = 0;
+let tdBuilt = false;
+const TD_SIZE = 480; // canvas render resolution per tile
+
+// shrink-to-fit text so nothing ever gets cut off, regardless of length
+function tdFitLines(ctx, lines, maxWidth, startSize, fontWeight){
+  let size = startSize;
+  while(size > 10){
+    ctx.font = `${fontWeight} ${size}px 'JetBrains Mono', monospace`;
+    const fits = lines.every(l => ctx.measureText(l).width <= maxWidth);
+    if(fits) return size;
+    size -= 2;
+  }
+  return size;
+}
+
+function tdRenderTile(canvas, tile, isDella){
+  canvas.width = TD_SIZE; canvas.height = TD_SIZE;
+  const ctx = canvas.getContext('2d');
+  const accent = tile.accent || '#c8ff00';
+  const pad = TD_SIZE * 0.09;
+  const innerW = TD_SIZE - pad*2;
+
+  // background
+  if(tile.type === 'photo' && tile.photoImg){
+    const img = tile.photoImg;
+    const iw = img.naturalWidth, ih = img.naturalHeight;
+    const scale = Math.max(TD_SIZE/iw, TD_SIZE/ih); // cover — fills the square tile
+    const dw = iw*scale, dh = ih*scale;
+    ctx.fillStyle = '#0d1117'; ctx.fillRect(0,0,TD_SIZE,TD_SIZE);
+    ctx.drawImage(img, (TD_SIZE-dw)/2, (TD_SIZE-dh)/2, dw, dh);
+    ctx.fillStyle = 'rgba(8,11,15,.28)'; ctx.fillRect(0,0,TD_SIZE,TD_SIZE);
+  } else {
+    ctx.fillStyle = isDella ? '#0a1005' : '#080c18';
+    ctx.fillRect(0,0,TD_SIZE,TD_SIZE);
+  }
+
+  // scanlines
+  ctx.fillStyle = 'rgba(0,0,0,.07)';
+  for(let y=0; y<TD_SIZE; y+=3) ctx.fillRect(0,y,TD_SIZE,1);
+
+  // top accent line
+  const grad = ctx.createLinearGradient(0,0,TD_SIZE,0);
+  grad.addColorStop(0,'transparent'); grad.addColorStop(.5,accent+'aa'); grad.addColorStop(1,'transparent');
+  ctx.fillStyle = grad; ctx.fillRect(0,0,TD_SIZE,3);
+
+  ctx.textBaseline = 'top';
+
+  if(tile.type === 'term'){
+    ctx.fillStyle = accent+'aa';
+    const cmdSize = tdFitLines(ctx, [tile.cmd], innerW, 15, 400);
+    ctx.font = `400 ${cmdSize}px 'JetBrains Mono', monospace`;
+    ctx.fillText(tile.cmd, pad, pad);
+    ctx.fillStyle = accent+'30'; ctx.fillRect(pad, pad+cmdSize+8, innerW, 1.5);
+    ctx.fillStyle = '#8892b0';
+    const outSize = tdFitLines(ctx, tile.out, innerW, 15, 400);
+    ctx.font = `400 ${outSize}px 'JetBrains Mono', monospace`;
+    let y = pad + cmdSize + 20;
+    tile.out.forEach(line => { ctx.fillText(line, pad, y); y += outSize*1.7; });
+  } else if(tile.type === 'brand' || tile.type === 'quote' || tile.type === 'count'){
+    const mainLines = tile.main.split('\n');
+    const startSize = tile.type === 'brand' ? 44 : tile.type === 'count' ? 40 : 26;
+    const mSize = tdFitLines(ctx, mainLines, innerW, startSize, 800);
+    ctx.font = `800 ${mSize}px 'JetBrains Mono', monospace`;
+    ctx.fillStyle = accent;
+    ctx.shadowColor = accent; ctx.shadowBlur = 14;
+    ctx.textAlign = 'center';
+    const totalH = mainLines.length * mSize*1.25;
+    let y = TD_SIZE/2 - totalH/2 - (tile.out.length?18:0);
+    mainLines.forEach(l => { ctx.fillText(l, TD_SIZE/2, y); y += mSize*1.25; });
+    ctx.shadowBlur = 0;
+    if(tile.out.length){
+      ctx.fillStyle = accent+'99';
+      const sSize = tdFitLines(ctx, tile.out, innerW, 16, 400);
+      ctx.font = `400 ${sSize}px 'JetBrains Mono', monospace`;
+      let sy = y + 10;
+      tile.out.forEach(l => { ctx.fillText(l, TD_SIZE/2, sy); sy += sSize*1.4; });
+    }
+    ctx.textAlign = 'left';
+  }
+}
+
+function tdRenderAll(){
+  const gridEl = document.getElementById('tdGrid');
+  gridEl.innerHTML = '';
+  TD_TILES.forEach((tile, i) => {
+    const wrap = document.createElement('div');
+    wrap.className = 'td-tile' + (i===tdSelected ? ' picked' : '');
+    const cv = document.createElement('canvas');
+    tdRenderTile(cv, tile, false); // exported art never includes the auto sprite
+    wrap.appendChild(cv);
+    if(tile.della){
+      const badge = document.createElement('div');
+      badge.textContent = '👀';
+      badge.style.cssText = 'position:absolute;top:4px;right:4px;font-size:14px;pointer-events:none;';
+      wrap.appendChild(badge);
+    }
+    wrap.addEventListener('click', () => { tdSelected = i; tdSyncEditor(); tdRenderAll(); });
+    gridEl.appendChild(wrap);
+  });
+  document.getElementById('tdStatus').textContent = `tile ${tdSelected+1}/18`;
+}
+
+function tdSyncEditor(){
+  const tile = TD_TILES[tdSelected];
+  document.getElementById('tdTileNum').textContent = tdSelected+1;
+  document.getElementById('tdType').value = tile.type;
+  document.getElementById('tdCmd').value = tile.type==='term' ? (tile.cmd||'') : (tile.main||'').replace(/\n/g,' ');
+  document.getElementById('tdOut').value = (tile.out||[]).join('\n');
+  document.getElementById('tdDellaSwitch').classList.toggle('on', !!tile.della);
+  document.querySelectorAll('.td-accent').forEach(sw => sw.classList.toggle('on', sw.dataset.c === tile.accent));
+}
+
+function tdBuildAccents(){
+  const wrap = document.getElementById('tdAccents');
+  wrap.innerHTML = '';
+  TD_COLORS.forEach(c => {
+    const sw = document.createElement('div');
+    sw.className = 'td-accent';
+    sw.style.background = c;
+    sw.dataset.c = c;
+    sw.addEventListener('click', () => {
+      TD_TILES[tdSelected].accent = c;
+      tdSyncEditor(); tdRenderAll();
+    });
+    wrap.appendChild(sw);
+  });
+}
+
+function tdApplyFields(){
+  const tile = TD_TILES[tdSelected];
+  const type = document.getElementById('tdType').value;
+  tile.type = type;
+  const cmdVal = document.getElementById('tdCmd').value;
+  const outVal = document.getElementById('tdOut').value.split('\n').filter(l=>l.length);
+  if(type === 'term'){ tile.cmd = cmdVal || '$'; tile.out = outVal; }
+  else { tile.main = cmdVal || '—'; tile.out = outVal; }
+  tdRenderAll();
+}
+['tdType','tdCmd','tdOut'].forEach(id => {
+  document.getElementById(id).addEventListener('input', tdApplyFields);
+  document.getElementById(id).addEventListener('change', tdApplyFields);
+});
+
+document.getElementById('tdDellaSwitch').addEventListener('click', () => {
+  const wasOn = TD_TILES[tdSelected].della;
+  TD_TILES.forEach(t => t.della = false); // only one bandit tile at a time
+  TD_TILES[tdSelected].della = !wasOn;
+  tdSyncEditor(); tdRenderAll();
+  toast(TD_TILES[tdSelected].della ? 'della is hiding here now 👀' : 'della moved out');
+});
+
+document.getElementById('tdPhotoBtn').addEventListener('click', () => document.getElementById('tdPhotoInput').click());
+document.getElementById('tdPhotoInput').addEventListener('change', e => {
+  const f = e.target.files[0]; if(!f) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    const img = new Image();
+    img.onload = () => {
+      TD_TILES[tdSelected].type = 'photo';
+      TD_TILES[tdSelected].photoImg = img;
+      document.getElementById('tdType').value = 'photo';
+      tdRenderAll();
+      toast('photo stitched into tile ' + (tdSelected+1));
+    };
+    img.src = ev.target.result;
+  };
+  reader.readAsDataURL(f);
+});
+
+document.getElementById('tdResetTileBtn').addEventListener('click', () => {
+  const tile = TD_TILES[tdSelected];
+  delete tile.photoImg;
+  tile.type = 'term'; tile.cmd = '$'; tile.out = [];
+  tdSyncEditor(); tdRenderAll();
+  toast('tile ' + (tdSelected+1) + ' cleared');
+});
+
+document.getElementById('tdSaveTileBtn').addEventListener('click', () => {
+  const cv = document.createElement('canvas');
+  tdRenderTile(cv, TD_TILES[tdSelected], false);
+  const url = cv.toDataURL('image/png');
+  saveImage(url, `termdoor_tile_${String(tdSelected+1).padStart(2,'0')}.png`);
+  toast('tile ' + (tdSelected+1) + ' saved');
+});
+
+document.getElementById('tdExportAllBtn').addEventListener('click', () => {
+  toast('exporting all 18 tiles…');
+  TD_TILES.forEach((tile, i) => setTimeout(() => {
+    const cv = document.createElement('canvas');
+    tdRenderTile(cv, tile, false);
+    saveImage(cv.toDataURL('image/png'), `termdoor_tile_${String(i+1).padStart(2,'0')}.png`);
+  }, i*200));
+});
+
+function tdRenderCaptions(){
+  const wrap = document.getElementById('tdsec-captions');
+  if(wrap.children.length) return;
+  TD_PLAN.forEach(p => {
+    const card = document.createElement('div');
+    card.className = 'td-cap-card';
+    card.style.borderColor = p.col+'44';
+    card.innerHTML = `<div class="td-cap-head">
+        <span class="td-cap-wk" style="color:${p.col}">${p.wk} · ${p.label}</span>
+        <span class="td-cap-tiles">${p.tiles}</span>
+      </div>
+      <div class="td-cap-text" style="opacity:.7;font-size:10px;margin-bottom:6px;">${p.row}</div>
+      <div class="td-cap-text">${p.cap}</div>
+      <div class="td-cap-copy">copy caption</div>`;
+    card.querySelector('.td-cap-copy').addEventListener('click', () => {
+      copyToClipboard(p.cap); toast('caption copied');
+    });
+    wrap.appendChild(card);
+  });
+}
+
+document.querySelectorAll('.td-tab').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.td-tab').forEach(t=>t.classList.remove('on'));
+    document.querySelectorAll('.td-sec').forEach(s=>s.classList.remove('on'));
+    btn.classList.add('on');
+    document.getElementById('tdsec-'+btn.dataset.tdtab).classList.add('on');
+    if(btn.dataset.tdtab === 'captions') tdRenderCaptions();
+  });
+});
+
+function renderTermdoor(){
+  if(tdBuilt) return;
+  tdBuilt = true;
+  tdBuildAccents();
+  tdSyncEditor();
+  tdRenderAll();
+}
 
 /* ============ GRID FORGE LOGIC ============ */
 let sourceImg = null;
@@ -543,13 +1002,27 @@ function forge(){
   const targetAspect = cols / rows;
 
   const nw = sourceImg.naturalWidth, nh = sourceImg.naturalHeight;
-  let sx, sy, sw, sh;
-  if (nw / nh > targetAspect){ sh=nh; sw=nh*targetAspect; sx=(nw-sw)/2; sy=0; }
-  else { sw=nw; sh=nw/targetAspect; sx=0; sy=(nh-sh)/2; }
-  const tileW = sw/cols, tileH = sh/rows;
-  const outSize = Math.min(1080, Math.round(Math.min(tileW, tileH)));
+
+  // Letterbox (contain) the FULL image into a canvas matching the target
+  // aspect ratio — nothing is ever cropped off, nothing is ever stretched.
+  // The image keeps its exact original proportions; padding fills the rest.
+  let canvasW, canvasH;
+  if (nw / nh > targetAspect){ canvasW = nw; canvasH = nw / targetAspect; }
+  else { canvasH = nh; canvasW = nh * targetAspect; }
+
+  const padColor = '#161b22'; // var(--surface), matches the theme
+  const composite = document.createElement('canvas');
+  composite.width = canvasW; composite.height = canvasH;
+  const cctx = composite.getContext('2d');
+  cctx.fillStyle = padColor;
+  cctx.fillRect(0, 0, canvasW, canvasH);
+  cctx.drawImage(sourceImg, (canvasW - nw) / 2, (canvasH - nh) / 2, nw, nh);
+
+  const tileW = canvasW/cols, tileH = canvasH/rows;
+  const outSize = Math.min(1080, Math.round(tileW));
 
   log(`❯ forging ${cols}×${rows} grid · ${cols*rows} tiles...`);
+  log('❯ full image preserved · no cropping', 'log-dim');
 
   const preview = document.getElementById('gridPreview');
   preview.innerHTML = '';
@@ -563,7 +1036,7 @@ function forge(){
       const canvas = document.createElement('canvas');
       canvas.width = outSize; canvas.height = outSize;
       const ctx = canvas.getContext('2d');
-      ctx.drawImage(sourceImg, sx+c*tileW, sy+r*tileH, tileW, tileH, 0, 0, outSize, outSize);
+      ctx.drawImage(composite, c*tileW, r*tileH, tileW, tileH, 0, 0, outSize, outSize);
       const dataUrl = canvas.toDataURL('image/png');
       tiles.push(dataUrl);
 
