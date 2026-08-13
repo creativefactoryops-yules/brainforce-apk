@@ -2,236 +2,616 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>BrainForce</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+<title>--force ./buildyou</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;600;700;800&family=Space+Grotesk:wght@300;400;500;700&display=swap" rel="stylesheet">
 <style>
 * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+:root{
+  --black:#080b0f; --deep:#0d1117; --surface:#161b22; --border:#21262d;
+  --moss:#3d5a3e; --moss-mid:#52734d; --moss-light:#7fb069; --acid:#b5ff4d;
+  --mist:#c8d8c0; --white:#f0f4f0; --dim:#6a7870;
+  --mono:'JetBrains Mono', monospace; --sans:'Space Grotesk', sans-serif;
+}
+html,body{height:100%;background:var(--black);color:var(--white);font-family:var(--sans);overflow:hidden;}
+#app{position:relative;width:100%;height:100%;overflow:hidden;}
+.view{position:absolute;inset:0;overflow-y:auto;-webkit-overflow-scrolling:touch;}
+.view.hidden{display:none;}
 
-:root {
-  --bg:#050508;
-  --surface:#0f0f14;
-  --surface-hi:#18181f;
-  --border:#1a1a22;
-  --text:#c8ff00;
-  --dim:#4a5a20;
-  --accent:#c8ff00;
-  --font:'Courier New','SF Mono',monospace;
-}
-[data-theme="green"] { --text:#00ff66; --accent:#00ff66; --dim:#1a5c33; }
-[data-theme="amber"]{ --text:#ffaa00; --accent:#ffaa00; --dim:#664400; }
-[data-theme="mist"] { --text:#88ccff; --accent:#88ccff; --dim:#335577; }
+/* ---- shared terminal chrome ---- */
+.term-chrome{display:flex;align-items:center;gap:6px;margin-bottom:0;}
+.dot{width:10px;height:10px;border-radius:50%;}
+.dot.red{background:#ff5f57;} .dot.yellow{background:#febc2e;} .dot.green{background:var(--moss-light);}
+.term-title{font-family:var(--mono);font-size:11px;color:var(--dim);margin-left:8px;letter-spacing:.5px;}
 
-body {
-  background:var(--bg); color:var(--text);
-  font-family:var(--font); height:100vh; overflow:hidden;
-  letter-spacing:3px; text-transform:uppercase; font-size:11px;
-}
+/* ---- HOME SCREEN ---- */
+#homeScreen{background:var(--black);}
+.home-inner{max-width:560px;margin:0 auto;padding:16px 16px 90px;}
 
-/* Status bar */
-.status {
-  background:#ccff00; color:#000;
-  display:flex; justify-content:space-between; align-items:center;
-  padding:6px 16px; font-size:10px; font-weight:bold; letter-spacing:2px;
-}
+.hero{background:var(--deep);border:1px solid var(--border);border-radius:4px;padding:22px 20px;position:relative;overflow:hidden;margin-bottom:22px;}
+.hero::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--moss-light),var(--acid),transparent);}
+.hero .term-chrome{margin-bottom:18px;}
+.prompt{font-family:var(--mono);font-size:12px;color:var(--moss-light);margin-bottom:3px;letter-spacing:.3px;}
+.prompt.dim{color:var(--dim);font-size:10.5px;margin-bottom:16px;}
+.hero-row{display:flex;align-items:center;justify-content:space-between;gap:14px;}
+.logo-block{flex:1;}
+.logo-line{font-family:var(--mono);font-size:clamp(22px,7vw,34px);font-weight:800;line-height:1.05;letter-spacing:-1px;}
+.flag{color:var(--dim);} .flag-value{color:var(--acid);} .pathc{color:var(--moss-light);}
+.cursor{display:inline-block;width:2px;height:.9em;background:var(--acid);margin-left:2px;vertical-align:middle;animation:blink 1s step-end infinite;}
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:0;}}
+.tagline{font-family:var(--mono);font-size:11px;color:var(--dim);margin-top:16px;padding-top:14px;border-top:1px solid var(--border);letter-spacing:.4px;}
+.tagline span{color:var(--moss-light);}
+#mascotCanvas{image-rendering:pixelated;width:64px;height:100px;flex:none;filter:drop-shadow(0 4px 10px rgba(0,0,0,.5));}
 
-/* Views */
-.view { position:absolute; inset:0; display:flex; flex-direction:column; transition:transform .3s ease; }
-#launcherView { transform:translateX(0); padding:16px; }
-#settingsView { transform:translateX(100%); padding:16px; overflow-y:auto; }
-#settingsView.open { transform:translateX(0); }
+.marquee-track{overflow:hidden;white-space:nowrap;border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:6px 0;margin-bottom:18px;background:rgba(127,176,105,.03);}
+.marquee-inner{display:inline-block;padding-left:100%;animation:marquee 16s linear infinite;color:var(--acid);font-family:var(--mono);font-size:11.5px;letter-spacing:.4px;}
+@keyframes marquee{0%{transform:translateX(0);}100%{transform:translateX(-100%);}}
 
-/* Launcher */
-.launcher-header {
-  display:flex; justify-content:space-between; align-items:flex-end;
-  margin:16px 0 12px; padding-bottom:12px; border-bottom:1px solid var(--border);
-}
-.clock { font-size:28px; letter-spacing:4px; }
-.date  { font-size:10px; color:var(--dim); margin-top:4px; }
-.prefs-btn {
-  background:var(--surface); border:1px solid var(--border);
-  color:var(--text); padding:10px 14px; border-radius:10px;
-  font-family:var(--font); font-size:10px; letter-spacing:2px; cursor:pointer;
-}
+.search-box{width:100%;padding:12px 14px;border-radius:4px;border:1px solid var(--border);background:var(--surface);color:var(--white);font-family:var(--mono);font-size:13px;margin-bottom:22px;}
+.search-box::placeholder{color:var(--dim);}
+.search-box:focus{outline:none;border-color:var(--moss-light);}
 
-.search {
-  background:var(--surface); border:1px solid var(--border); border-radius:12px;
-  padding:14px 16px; color:var(--text); font-family:var(--font); font-size:12px;
-  letter-spacing:2px; width:100%; margin-bottom:16px; outline:none;
-}
-.search::placeholder { color:var(--dim); }
+.section-label{font-family:var(--mono);font-size:10px;color:var(--dim);letter-spacing:2px;text-transform:uppercase;margin-bottom:14px;}
 
-.apps-grid {
-  flex:1; overflow-y:auto;
-  display:grid; grid-template-columns:repeat(4,1fr); gap:14px;
-  padding-bottom:20px;
-}
-.app-item {
-  display:flex; flex-direction:column; align-items:center;
-  padding:12px 6px; border-radius:14px; background:var(--surface);
-  border:1px solid var(--border); cursor:pointer; text-align:center;
-}
-.app-item:active { transform:scale(.95); background:var(--surface-hi); }
-.app-icon {
-  width:52px; height:52px; border-radius:14px; margin-bottom:8px;
-  object-fit:cover; background:var(--surface-hi);
-  display:flex; align-items:center; justify-content:center; font-size:22px;
-}
-.app-name { font-size:8px; letter-spacing:1px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; width:100%; }
+.app-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px 6px;}
+.app-tile{display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;user-select:none;}
+.app-tile:active{transform:scale(.94);}
+.app-icon{width:48px;height:48px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:19px;font-weight:700;background:var(--surface);border:1px solid var(--border);}
+.app-label{font-family:var(--mono);font-size:11px;text-align:center;line-height:1.2;color:var(--mist);}
+.app-tile.hidden{display:none;}
+.app-tile.featured .app-icon{border-color:var(--acid);box-shadow:0 0 0 1px rgba(181,255,77,.15),0 0 14px rgba(181,255,77,.1);}
+.app-tile.featured .app-label{color:var(--acid);}
 
-/* Settings */
-.section-title { color:var(--dim); font-size:10px; margin:24px 0 10px; letter-spacing:4px; }
-.card {
-  background:var(--surface); border:1px solid var(--border); border-radius:14px;
-  padding:16px; margin-bottom:10px; display:flex; justify-content:space-between;
-  align-items:center; cursor:pointer;
-}
-.card-left { display:flex; align-items:center; gap:10px; }
-.dot { width:18px; height:18px; border-radius:50%; box-shadow:0 0 8px currentColor; }
-.selected { background:var(--surface-hi); border-color:var(--accent); }
+/* ---- GRID FORGE VIEW ---- */
+#gridForgeView{background:var(--black);}
+.forge-header{position:sticky;top:0;z-index:15;background:var(--deep);border-bottom:1px solid var(--border);padding:14px 16px;}
+.forge-header::before{content:'';display:block;position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--moss-light),var(--acid),transparent);}
+.header-row{display:flex;align-items:center;gap:10px;margin-top:14px;}
+.back-btn{width:30px;height:30px;border-radius:4px;border:1px solid var(--border);background:var(--surface);color:var(--mist);font-size:16px;display:flex;align-items:center;justify-content:center;flex:none;font-family:var(--mono);}
+.forge-title{font-family:var(--mono);font-size:14px;font-weight:700;color:var(--white);}
+.forge-sub{font-size:10px;color:var(--dim);font-family:var(--mono);}
+.status-chip{margin-left:auto;font-size:10px;padding:4px 8px;border-radius:3px;border:1px solid var(--border);color:var(--moss-light);font-family:var(--mono);white-space:nowrap;}
 
-.stat-card { background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:8px 16px; }
-.stat-row { display:flex; justify-content:space-between; padding:12px 0; border-bottom:1px solid var(--border); }
-.stat-row:last-child { border:none; }
+.forge-body{padding:16px;max-width:560px;margin:0 auto;padding-bottom:60px;}
+.chamber{border:1px solid var(--border);border-radius:4px;background:var(--surface);padding:14px;margin-bottom:16px;}
+.chamber-label{font-size:10px;color:var(--dim);letter-spacing:1px;margin-bottom:10px;text-transform:uppercase;font-family:var(--mono);}
+.drop-zone{border:1px dashed var(--border);border-radius:4px;padding:24px 12px;text-align:center;color:var(--dim);font-family:var(--mono);font-size:12px;cursor:pointer;background:var(--deep);position:relative;overflow:hidden;min-height:110px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;}
+.drop-zone.has-image{border-style:solid;border-color:var(--moss-light);}
+.drop-zone img{max-width:100%;max-height:150px;border-radius:4px;}
+.drop-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;}
 
-.req-btn {
-  border:1px solid var(--border); background:transparent; color:var(--text);
-  padding:6px 12px; border-radius:8px; font-family:var(--font); font-size:10px; cursor:pointer;
-}
+.controls-row{display:flex;gap:10px;margin-top:14px;}
+.control-group{flex:1;}
+.control-label{display:block;font-size:9.5px;color:var(--dim);letter-spacing:.5px;margin-bottom:5px;text-transform:uppercase;font-family:var(--mono);}
+.forge-select{width:100%;padding:9px;border-radius:4px;border:1px solid var(--border);background:var(--deep);color:var(--white);font-family:var(--mono);font-size:12.5px;}
 
-.pixel {
-  text-align:center; margin-top:30px; font-size:42px; line-height:1; filter: drop-shadow(0 0 6px var(--accent));
-}
-.brand {
-  text-align:center; color:var(--dim); margin-top:10px; font-size:10px; letter-spacing:4px; margin-bottom:30px;
-}
+.forge-btn{flex:1;padding:12px;border-radius:4px;border:1px solid var(--moss-light);background:rgba(127,176,105,.08);color:var(--acid);font-family:var(--mono);font-weight:700;font-size:12px;letter-spacing:.3px;}
+.forge-btn:active{transform:scale(.97);}
+.forge-btn.secondary{border-color:var(--border);color:var(--dim);background:var(--deep);}
+.forge-btn:disabled{opacity:.35;}
 
-.empty { grid-column:1/-1; text-align:center; padding:50px 20px; color:var(--dim); }
-.loading { grid-column:1/-1; text-align:center; padding:50px; color:var(--dim); }
+.term-log{border:1px solid var(--border);border-radius:4px;background:var(--black);padding:10px 12px;font-family:var(--mono);font-size:11px;line-height:1.7;color:var(--moss-light);max-height:110px;overflow-y:auto;margin-bottom:16px;}
+.term-log div{white-space:pre-wrap;word-break:break-word;}
+.log-dim{color:var(--dim);} .log-acid{color:var(--acid);}
+
+.output-label{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;font-size:10px;color:var(--dim);letter-spacing:1px;text-transform:uppercase;font-family:var(--mono);}
+.grid-preview{display:grid;gap:2px;background:var(--border);border-radius:4px;overflow:hidden;border:1px solid var(--border);}
+.grid-tile{position:relative;aspect-ratio:1/1;background:var(--surface);}
+.grid-tile img{width:100%;height:100%;object-fit:cover;display:block;}
+.tile-badge{position:absolute;top:4px;left:4px;background:rgba(8,11,15,.8);color:var(--acid);font-size:9px;padding:2px 5px;border-radius:3px;border:1px solid rgba(181,255,77,.3);font-family:var(--mono);}
+.tile-dl{position:absolute;bottom:0;left:0;right:0;background:rgba(8,11,15,.85);color:var(--mist);font-size:9px;text-align:center;padding:4px 0;opacity:0;transition:opacity .15s;font-family:var(--mono);}
+.grid-tile:active .tile-dl{opacity:1;}
+
+.download-row{display:flex;gap:10px;margin-top:14px;}
+.order-strip{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;}
+.order-chip{font-size:10.5px;padding:5px 8px;border-radius:3px;background:var(--surface);border:1px solid var(--border);color:var(--moss-light);font-family:var(--mono);}
+.readme-note{margin-top:16px;font-family:var(--mono);font-size:10px;color:var(--dim);text-align:center;}
+
+.della-tabs{display:flex;gap:6px;margin-bottom:18px;overflow-x:auto;}
+.della-tab{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:6px 12px;color:var(--dim);font-family:var(--mono);font-size:11px;letter-spacing:.5px;cursor:pointer;white-space:nowrap;flex-shrink:0;}
+.della-tab.on{background:rgba(181,255,77,.1);border-color:var(--acid);color:var(--acid);}
+.della-sec{display:none;} .della-sec.on{display:block;}
+
+.squad-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+.sticker-card{background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:12px 8px;display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;}
+.sticker-card canvas{image-rendering:pixelated;width:52px;height:82px;}
+.sticker-week{font-family:var(--mono);font-size:9px;color:var(--dim);letter-spacing:1px;}
+.sticker-name{font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.5px;}
+.sticker-slogan{font-family:var(--mono);font-size:9px;color:var(--dim);line-height:1.4;}
+
+.quote-card{background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:14px;margin-bottom:10px;position:relative;overflow:hidden;cursor:pointer;}
+.quote-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;}
+.quote-tag{font-family:var(--mono);font-size:9px;color:var(--dim);letter-spacing:2px;margin-bottom:6px;}
+.quote-text{font-family:var(--mono);font-size:12.5px;font-weight:700;line-height:1.6;letter-spacing:.3px;color:var(--white);}
+.quote-author{font-family:var(--mono);font-size:9px;letter-spacing:1.5px;margin-top:8px;opacity:.85;}
+
+.toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%);background:var(--surface);border:1px solid var(--moss-light);color:var(--white);padding:10px 16px;border-radius:4px;font-family:var(--mono);font-size:12px;z-index:99;opacity:0;pointer-events:none;transition:opacity .25s, transform .25s;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(-6px);}
 </style>
 </head>
-<body data-theme="default">
+<body>
+<div id="app">
 
-<!-- LAUNCHER VIEW -->
-<div class="view" id="launcherView">
-  <div class="launcher-header">
-    <div>
-      <div class="clock" id="clock">00:00</div>
-      <div class="date" id="date">---</div>
+  <!-- ============ HOME SCREEN ============ -->
+  <div id="homeScreen" class="view">
+    <div class="home-inner">
+
+      <div class="hero">
+        <div class="term-chrome">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="term-title">~/buildyou — bash</span>
+        </div>
+        <div class="prompt">❯ git commit -m "shipped anyway"</div>
+        <div class="prompt dim">[main 3a7f2c1] shipped anyway — 1 file changed</div>
+        <div class="hero-row">
+          <div class="logo-block">
+            <div class="logo-line"><span class="flag">--</span><span class="flag-value">force</span></div>
+            <div class="logo-line"><span class="pathc">./build</span><span style="color:var(--acid);">you</span><span class="cursor"></span></div>
+          </div>
+          <canvas id="mascotCanvas" width="14" height="22"></canvas>
+        </div>
+        <div class="tagline"><span>rm -rf doubt</span> &nbsp;·&nbsp; solo builder &nbsp;·&nbsp; ships weird</div>
+      </div>
+
+      <div class="marquee-track">
+        <div class="marquee-inner">della_init → della_focus → della_build → della_debug → della_rest → della_force · --force ./buildyou · creativefactory.studio ·&nbsp;</div>
+      </div>
+
+      <input class="search-box" id="searchBox" placeholder="❯ search apps..." autocomplete="off">
+
+      <div class="section-label">// installed</div>
+      <div class="app-grid" id="appGrid"></div>
     </div>
-    <button class="prefs-btn" onclick="openSettings()">PREFS</button>
   </div>
-  <input type="text" class="search" id="search" placeholder="> SEARCH APPS" oninput="filterApps()">
-  <div class="apps-grid" id="grid"><div class="loading">SCANNING...</div></div>
+
+  <!-- ============ GRID FORGE VIEW ============ -->
+  <div id="gridForgeView" class="view hidden">
+    <div class="forge-header">
+      <div class="term-chrome">
+        <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+        <span class="term-title">~/buildyou/grid-forge — bash</span>
+      </div>
+      <div class="header-row">
+        <button class="back-btn" id="backBtn">‹</button>
+        <div>
+          <div class="forge-title">grid_forge</div>
+          <div class="forge-sub">--force ./buildyou</div>
+        </div>
+        <div class="status-chip" id="tileCount">awaiting image</div>
+      </div>
+    </div>
+
+    <div class="forge-body">
+      <div class="term-log" id="termLog">
+        <div class="log-acid">❯ ./gridforge --init</div>
+        <div>grid_forge v1.0 · --force ./buildyou</div>
+        <div class="log-dim">// drop an image into the chamber to begin</div>
+      </div>
+
+      <div class="chamber">
+        <div class="chamber-label">❯ image chamber</div>
+        <div class="drop-zone" id="dropZone">
+          <div>drop or tap to load image</div>
+          <input type="file" id="fileInput" accept="image/*">
+        </div>
+
+        <div class="controls-row">
+          <div class="control-group">
+            <label class="control-label">grid layout</label>
+            <select class="forge-select" id="gridLayout">
+              <option value="1x1">1×1 · single square</option>
+              <option value="2x2" selected>2×2 · 4 tiles</option>
+              <option value="3x3">3×3 · 9 tiles</option>
+              <option value="4x4">4×4 · 16 tiles</option>
+              <option value="3x1">3×1 · horizontal banner</option>
+              <option value="1x3">1×3 · vertical strip</option>
+            </select>
+          </div>
+          <div class="control-group">
+            <label class="control-label">tile border</label>
+            <select class="forge-select" id="borderStyle">
+              <option value="none">none</option>
+              <option value="thin">thin line</option>
+              <option value="thick">thick frame</option>
+              <option value="glow">acid glow</option>
+            </select>
+          </div>
+        </div>
+        <div class="controls-row">
+          <button class="forge-btn" id="forgeBtn" disabled>⚒ forge grid</button>
+          <button class="forge-btn secondary" id="clearBtn">rm -rf</button>
+        </div>
+      </div>
+
+      <div id="outputSection" style="display:none;">
+        <div class="output-label">
+          <span>// forged tiles</span>
+          <span id="outputDims" style="color:var(--moss-light);"></span>
+        </div>
+        <div class="grid-preview" id="gridPreview"></div>
+        <div class="download-row">
+          <button class="forge-btn" id="downloadAllBtn">⬇ download all</button>
+          <button class="forge-btn secondary" id="orderGuideBtn">📋 post order</button>
+        </div>
+        <div id="orderGuide" style="display:none;">
+          <div class="control-label" style="margin-top:12px;">post in this order (top-left ends up correct)</div>
+          <div class="order-strip" id="orderStrip"></div>
+        </div>
+        <div class="readme-note">// tiles saved to your downloads folder</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ DELLA SQUAD / QUOTES / CARE VIEW ============ -->
+  <div id="dellaView" class="view hidden">
+    <div class="forge-header">
+      <div class="term-chrome">
+        <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+        <span class="term-title">~/buildyou/della — bash</span>
+      </div>
+      <div class="header-row">
+        <button class="back-btn" id="dellaBackBtn">‹</button>
+        <div>
+          <div class="forge-title">della_squad</div>
+          <div class="forge-sub">--force ./buildyou · stickers &amp; quotes</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="forge-body">
+      <div class="della-tabs" id="dellaTabs">
+        <button class="della-tab on" data-dtab="squad">☆ squad</button>
+        <button class="della-tab" data-dtab="quotes">❯ quotes</button>
+        <button class="della-tab" data-dtab="care">♡ care</button>
+      </div>
+
+      <div class="della-sec on" id="dsec-squad">
+        <div class="section-label">// della × 6 · the mob</div>
+        <div class="squad-grid" id="squadGrid"></div>
+      </div>
+
+      <div class="della-sec" id="dsec-quotes">
+        <div class="section-label">// quote stickers · tap to copy</div>
+        <div id="quotesList"></div>
+      </div>
+
+      <div class="della-sec" id="dsec-care">
+        <div class="section-label">// self care · for the builders who forget</div>
+        <div id="careList"></div>
+      </div>
+    </div>
+  </div>
+
 </div>
 
-<!-- SETTINGS VIEW -->
-<div class="view" id="settingsView">
-  <div class="launcher-header" style="margin-top:0;">
-    <div style="font-size:18px; letter-spacing:4px;">PREFERENCES</div>
-    <button class="prefs-btn" onclick="closeSettings()">BACK</button>
-  </div>
-
-  <div class="section-title">THEME</div>
-  <div class="card" id="t-default" onclick="setTheme('default')">
-    <div class="card-left"><span style="margin-right:6px;">></span> CF - DEFAULT</div>
-    <div class="dot" style="background:#c8ff00; color:#c8ff00;"></div>
-  </div>
-  <div class="card" id="t-green" onclick="setTheme('green')">
-    <div class="card-left"><span style="margin-right:6px; opacity:0;">></span> GREEN</div>
-    <div class="dot" style="background:#00ff66; color:#00ff66;"></div>
-  </div>
-  <div class="card" id="t-amber" onclick="setTheme('amber')">
-    <div class="card-left"><span style="margin-right:6px; opacity:0;">></span> AMBER</div>
-    <div class="dot" style="background:#ffaa00; color:#ffaa00;"></div>
-  </div>
-  <div class="card" id="t-mist" onclick="setTheme('mist')">
-    <div class="card-left"><span style="margin-right:6px; opacity:0;">></span> MIST</div>
-    <div class="dot" style="background:#88ccff; color:#88ccff;"></div>
-  </div>
-
-  <div class="section-title">PERMISSIONS</div>
-  <div class="card" style="cursor:default;">
-    <div>
-      <div style="font-size:12px;">Notifications</div>
-      <div style="font-size:9px; color:var(--dim); margin-top:2px; text-transform:none; letter-spacing:1px;">enable for tidy reminders</div>
-    </div>
-    <button class="req-btn" onclick="reqNotify()">REQUEST</button>
-  </div>
-
-  <div class="section-title">SESSION</div>
-  <div class="stat-card">
-    <div class="stat-row"><span>Energy</span><span>mid</span></div>
-    <div class="stat-row"><span>Focus sessions</span><span>0</span></div>
-    <div class="stat-row"><span>Vault entries</span><span>1</span></div>
-    <div class="stat-row"><span>Brain dump</span><span>0 chars</span></div>
-    <div class="stat-row"><span>Briefs saved</span><span>0</span></div>
-  </div>
-
-  <div class="pixel">👾</div>
-  <div class="brand">CreativeFactory.studio</div>
-</div>
+<div class="toast" id="toast"></div>
 
 <script>
-let allApps=[];
-let theme=localStorage.getItem('theme')||'default';
-document.body.setAttribute('data-theme',theme);
-updateThemeUI();
-
-function updateClock(){
-  const n=new Date();
-  document.getElementById('clock').textContent=n.toLocaleTimeString('en-US',{hour12:false,hour:'2-digit',minute:'2-digit'});
-  document.getElementById('date').textContent=n.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'}).toUpperCase();
+/* ============ NATIVE BRIDGE ============ */
+const Native = window.AndroidBridge || null;
+function notifyNative(view){ if (Native && Native.onViewChange) { try{ Native.onViewChange(view); }catch(e){} } }
+function saveImage(base64png, filename){
+  if (Native && Native.saveImage){ try { Native.saveImage(base64png, filename); return; } catch(e){} }
+  const a=document.createElement('a'); a.href=base64png; a.download=filename;
+  document.body.appendChild(a); a.click(); a.remove();
 }
-setInterval(updateClock,1000); updateClock();
 
-function openSettings(){ document.getElementById('settingsView').classList.add('open'); }
-function closeSettings(){ document.getElementById('settingsView').classList.remove('open'); }
-
-function setTheme(t){
-  theme=t; localStorage.setItem('theme',t);
-  document.body.setAttribute('data-theme',t);
-  updateThemeUI();
+/* ============ TOAST ============ */
+let toastTimer;
+function toast(msg){
+  const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show');
+  clearTimeout(toastTimer); toastTimer=setTimeout(()=>t.classList.remove('show'),2200);
 }
-function updateThemeUI(){
-  ['default','green','amber','mist'].forEach(t=>{
-    const el=document.getElementById('t-'+t);
-    const arrow=el.querySelector('.card-left span');
-    if(t===theme){ el.classList.add('selected'); arrow.style.opacity='1'; }
-    else { el.classList.remove('selected'); arrow.style.opacity='0'; }
+
+/* ============ DELLA SPRITE — ported from The_Della_Effect brand sticker pack ============ */
+const dellaChar = { col:'#ffb700', hcol:'#ff4400', kcol:'#ffb700', kdark:'#cc8800', ncol:'#1a0800', ndark:'#0a0400' };
+const F0=['___RRRRRRRR___','__RRRrrrrRR___','___RSSSSSSR___','____SSSSSS____','____SEESEE____','____SGWSGW____','____SSSSSS____','____SpSSpS____','____SSmmSS____','____SSSSSS____','____SKKKKS____','___KKKKKKK____','A__KKKKKK_____','A__KKKKKKK____','___KKKKKKK____','___NNNNNNN____','__NNNNNNNNN___','__nNNNNNNNn___','____LL__LL____','____LL__LL____','___BBB__BBB___','___BBB__BBB___'];
+const F1=['A___RRRRRRRR__','_A__RRRrrrrRR_','__A_RSSSSSSR__','____SSSSSS____','____SEESEE____','____SGWSGW____','____SSSSSS____','____SpSSpS____','____SSmmSS____','____SSSSSS____','____SKKKKS____','___KKKKKKK____','___KKKKKK_____','___KKKKKKK____','___KKKKKKK____','___NNNNNNN____','__NNNNNNNNN___','__nNNNNNNNn___','____LL__LL____','____LL__LL____','___BBB__BBB___','___BBB__BBB___'];
+const blinkShape = f => f.map((r,i)=>(i===4||i===5)?'____SSSSSS____':r);
+
+function drawDella(cv, char, frame, blinking, px){
+  const pal={_:null,S:'#fdd9b5',E:'#1a1028',W:'#fff',p:'#ff9898',m:'#cc4040',L:'#fdd9b5',B:'#181828',A:'#fdd9b5',G:char.col,R:char.hcol,r:char.hcol+'99',K:char.kcol,k:char.kdark,N:char.ncol,n:char.ndark};
+  const rows = blinking ? blinkShape(frame ? F1 : F0) : (frame ? F1 : F0);
+  const ctx = cv.getContext('2d');
+  ctx.clearRect(0,0,cv.width,cv.height);
+  rows.forEach((row,ri)=>row.split('').forEach((ch,ci)=>{
+    const col = pal[ch];
+    if (col){ ctx.fillStyle=col; ctx.fillRect(ci,ri,1,1); }
+  }));
+}
+
+const mascotCanvas = document.getElementById('mascotCanvas');
+let dellaFrame = 0, dellaBlink = false;
+drawDella(mascotCanvas, dellaChar, 0, false);
+setInterval(()=>{ dellaFrame = dellaFrame ? 0 : 1; drawDella(mascotCanvas, dellaChar, dellaFrame, dellaBlink); }, 420);
+function scheduleBlink(){
+  setTimeout(()=>{
+    dellaBlink = true; drawDella(mascotCanvas, dellaChar, dellaFrame, true);
+    setTimeout(()=>{ dellaBlink = false; drawDella(mascotCanvas, dellaChar, dellaFrame, false); scheduleBlink(); }, 150);
+  }, 2600 + Math.random()*2200);
+}
+scheduleBlink();
+
+/* ============ DELLA SQUAD / QUOTES / CARE ============ */
+const CHARS=[
+  {id:0,cmd:'della_init', short:'INIT', week:1,col:'#c8ff00',hcol:'#f21428',kcol:'#c8ff00',kdark:'#6a9000',ncol:'#1a2035',ndark:'#0a1025',slogan:'every build starts somewhere'},
+  {id:1,cmd:'della_focus',short:'FOCUS',week:2,col:'#00e5ff',hcol:'#3a88ff',kcol:'#00e5ff',kdark:'#009bb5',ncol:'#1a3040',ndark:'#0a1828',slogan:'rm -rf distractions'},
+  {id:2,cmd:'della_build',short:'BUILD',week:3,col:'#ff6b35',hcol:'#ff2200',kcol:'#ff6b35',kdark:'#cc3300',ncol:'#2a1008',ndark:'#180800',slogan:"ship || it didn't happen"},
+  {id:3,cmd:'della_debug',short:'DEBUG',week:4,col:'#b79cff',hcol:'#8844ee',kcol:'#b79cff',kdark:'#7c5ccc',ncol:'#180840',ndark:'#0a0425',slogan:'the bug was you all along'},
+  {id:4,cmd:'della_rest', short:'REST', week:5,col:'#ff9ec8',hcol:'#f21428',kcol:'#ff9ec8',kdark:'#cc4488',ncol:'#2a0818',ndark:'#180410',slogan:'recharge is not optional'},
+  {id:5,cmd:'della_force',short:'FORCE',week:6,col:'#ffb700',hcol:'#ff4400',kcol:'#ffb700',kdark:'#cc8800',ncol:'#1a0800',ndark:'#0a0400',slogan:'--force ./buildyou'},
+];
+
+const QUOTES=[
+  {q:'rm -rf doubt',a:'❯ y_',col:'#b5ff4d'},
+  {q:"ship || it didn't happen",a:'della_build',col:'#ff6b35'},
+  {q:'the bug was you all along',a:'della_debug',col:'#b79cff'},
+  {q:'every build starts somewhere',a:'della_init',col:'#b5ff4d'},
+  {q:'recharge is not optional',a:'della_rest',col:'#ff9ec8'},
+  {q:'--force ./buildyou',a:'della_force',col:'#ffb700'},
+  {q:'solo does not mean slow',a:'❯ y_',col:'#00e5ff'},
+  {q:'I build alone. I deploy anyway.',a:'creativefactory.studio',col:'#b5ff4d'},
+];
+
+const CARE=[
+  {q:'ADHD is not a bug. it is a feature you have not documented yet.',col:'#ff9ec8'},
+  {q:'one tab at a time. one task at a time. one breath at a time.',col:'#00e5ff'},
+  {q:'done is better than perfect. shipped beats planned.',col:'#b5ff4d'},
+  {q:'rest is not quitting. it is rebooting.',col:'#b79cff'},
+  {q:'your hyperfocus is a superpower. your rest is protection.',col:'#ffb700'},
+  {q:'you do not have to earn rest. della_rest runs on a cron job.',col:'#ff9ec8'},
+];
+
+function drawCharSprite(cv, char, frame, blinking){
+  drawDella(cv, char, frame, blinking);
+}
+
+let squadBuilt = false;
+function renderDellaView(){
+  if (squadBuilt) return;
+  squadBuilt = true;
+
+  const squadGrid = document.getElementById('squadGrid');
+  const canvases = [];
+  CHARS.forEach(char=>{
+    const card = document.createElement('div');
+    card.className = 'sticker-card';
+    const cv = document.createElement('canvas');
+    cv.width = 14; cv.height = 22;
+    card.innerHTML = `<div class="sticker-week" style="color:${char.col}">WK${char.week} · ${char.short}</div>`;
+    card.appendChild(cv);
+    const meta = document.createElement('div');
+    meta.innerHTML = `<div class="sticker-name">${char.cmd}</div><div class="sticker-slogan">"${char.slogan}"</div>`;
+    card.appendChild(meta);
+    squadGrid.appendChild(card);
+    canvases.push({cv, char});
+    drawCharSprite(cv, char, 0, false);
+  });
+
+  let frame = 0;
+  setInterval(()=>{
+    frame = frame ? 0 : 1;
+    canvases.forEach(({cv,char})=>drawCharSprite(cv, char, frame, false));
+  }, 450);
+
+  const quotesList = document.getElementById('quotesList');
+  QUOTES.forEach(item=>{
+    const card = document.createElement('div');
+    card.className = 'quote-card';
+    card.style.setProperty('border-color', item.col + '55');
+    card.innerHTML = `<div class="quote-card-bar" style="position:absolute;top:0;left:0;right:0;height:2px;background:${item.col};"></div><div class="quote-tag">❯ quote</div><div class="quote-text">"${item.q}"</div><div class="quote-author" style="color:${item.col}">— ${item.a}</div>`;
+    card.addEventListener('click', ()=>{
+      copyToClipboard(item.q);
+      toast('quote copied');
+    });
+    quotesList.appendChild(card);
+  });
+
+  const careList = document.getElementById('careList');
+  CARE.forEach(item=>{
+    const card = document.createElement('div');
+    card.className = 'quote-card';
+    card.style.setProperty('border-color', item.col + '55');
+    card.innerHTML = `<div class="quote-card-bar" style="position:absolute;top:0;left:0;right:0;height:2px;background:${item.col};"></div><div class="quote-tag">❯ care</div><div class="quote-text">${item.q}</div>`;
+    card.addEventListener('click', ()=>{
+      copyToClipboard(item.q);
+      toast('copied');
+    });
+    careList.appendChild(card);
   });
 }
 
-async function loadApps(){
-  const g=document.getElementById('grid');
-  try{
-    const r=await Capacitor.Plugins.AppLauncher.getApps();
-    allApps=r.apps||[];
-    render(allApps);
-  }catch(e){
-    g.innerHTML='<div class="empty">GRANT PERMISSIONS TO LIST APPS</div>';
+function copyToClipboard(text){
+  if (navigator.clipboard) navigator.clipboard.writeText(text).catch(()=>{});
+  else {
+    const ta = document.createElement('textarea');
+    ta.value = text; document.body.appendChild(ta); ta.select();
+    try { document.execCommand('copy'); } catch(e){}
+    ta.remove();
   }
 }
-function render(apps){
-  const g=document.getElementById('grid');
-  if(!apps.length){ g.innerHTML='<div class="empty">NO APPS FOUND</div>'; return; }
-  g.innerHTML=apps.map(a=>`
-    <div class="app-item" onclick="launch('${a.package}','${a.activity}')">
-      ${a.icon?`<img src="${a.icon}" class="app-icon">`:`<div class="app-icon">📱</div>`}
-      <div class="app-name">${esc(a.name)}</div>
-    </div>`).join('');
-}
-function filterApps(){
-  const q=document.getElementById('search').value.toLowerCase();
-  render(allApps.filter(a=>a.name.toLowerCase().includes(q)));
-}
-async function launch(pkg,act){
-  try{ await Capacitor.Plugins.AppLauncher.launchApp({package:pkg,activity:act}); }
-  catch(e){ console.error(e); }
-}
-function esc(t){ const d=document.createElement('div'); d.textContent=t; return d.innerHTML; }
-function reqNotify(){ alert('Request notification permission via Android Settings > Apps > BrainForce'); }
 
-document.addEventListener('DOMContentLoaded',loadApps);
+document.querySelectorAll('.della-tab').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('.della-tab').forEach(t=>t.classList.remove('on'));
+    document.querySelectorAll('.della-sec').forEach(s=>s.classList.remove('on'));
+    btn.classList.add('on');
+    document.getElementById('dsec-' + btn.dataset.dtab).classList.add('on');
+  });
+});
+
+/* ============ APP GRID ============ */
+const apps = [
+  {label:'grid_forge', tag:'⚒', color:'var(--acid)', featured:true, action:()=>openGridForge()},
+  {label:'della_squad', tag:'☆', color:'var(--acid)', featured:true, action:()=>openDellaView()},
+  {label:'the_della_effect', tag:'✦', color:'var(--moss-light)', featured:true, action:()=>openExternal('https://react-9bubnc.onspace.build/')},
+  {label:'chrome', tag:'◎'}, {label:'settings', tag:'⚙'}, {label:'play store', tag:'▷'},
+  {label:'maps', tag:'⌖'}, {label:'messages', tag:'✉'}, {label:'photos', tag:'▣'},
+  {label:'meet', tag:'▮'}, {label:'gmail', tag:'✎'}, {label:'youtube', tag:'▶'},
+  {label:'contacts', tag:'◉'}, {label:'phone', tag:'☏'}, {label:'camera', tag:'▭'},
+  {label:'browser', tag:'≡'}, {label:'gallery', tag:'▦'},
+];
+
+const grid = document.getElementById('appGrid');
+apps.forEach(app=>{
+  const tile = document.createElement('div');
+  tile.className = 'app-tile' + (app.featured ? ' featured' : '');
+  tile.innerHTML = `<div class="app-icon" style="color:${app.color||'var(--mist)'}">${app.tag}</div><div class="app-label">${app.label}</div>`;
+  tile.addEventListener('click', ()=>{ if (app.action) app.action(); else toast(app.label + ' — decorative tile'); });
+  tile._label = app.label.toLowerCase();
+  grid.appendChild(tile);
+});
+document.getElementById('searchBox').addEventListener('input', e=>{
+  const q = e.target.value.trim().toLowerCase();
+  [...grid.children].forEach(tile=>tile.classList.toggle('hidden', q && !tile._label.includes(q)));
+});
+function openExternal(url){
+  if (Native && Native.openUrl){ try{ Native.openUrl(url); return; }catch(e){} }
+  window.open(url, '_blank');
+}
+
+/* ============ VIEW SWITCHING ============ */
+function openGridForge(){ document.getElementById('homeScreen').classList.add('hidden'); document.getElementById('dellaView').classList.add('hidden'); document.getElementById('gridForgeView').classList.remove('hidden'); notifyNative('grid'); }
+function openDellaView(){ document.getElementById('homeScreen').classList.add('hidden'); document.getElementById('gridForgeView').classList.add('hidden'); document.getElementById('dellaView').classList.remove('hidden'); notifyNative('della'); renderDellaView(); }
+function goHome(){ document.getElementById('gridForgeView').classList.add('hidden'); document.getElementById('dellaView').classList.add('hidden'); document.getElementById('homeScreen').classList.remove('hidden'); notifyNative('home'); }
+document.getElementById('backBtn').addEventListener('click', goHome);
+document.getElementById('dellaBackBtn').addEventListener('click', goHome);
+window.goHome = goHome;
+
+/* ============ GRID FORGE LOGIC ============ */
+let sourceImg = null;
+const dropZone = document.getElementById('dropZone');
+const forgeBtn = document.getElementById('forgeBtn');
+const clearBtn = document.getElementById('clearBtn');
+const termLog = document.getElementById('termLog');
+const tileCount = document.getElementById('tileCount');
+
+function log(msg, cls){ const d=document.createElement('div'); if(cls) d.className=cls; d.textContent=msg; termLog.appendChild(d); termLog.scrollTop=termLog.scrollHeight; }
+
+function wireFileInput(){
+  const fi = document.getElementById('fileInput');
+  fi.addEventListener('change', e=>{ const f=e.target.files[0]; if(f) loadFile(f); });
+}
+wireFileInput();
+dropZone.addEventListener('dragover', e=>e.preventDefault());
+dropZone.addEventListener('drop', e=>{ e.preventDefault(); const f=e.dataTransfer.files[0]; if(f) loadFile(f); });
+
+function loadFile(file){
+  const reader = new FileReader();
+  reader.onload = ev=>{
+    const img = new Image();
+    img.onload = ()=>{
+      sourceImg = img;
+      dropZone.classList.add('has-image');
+      dropZone.innerHTML = `<img src="${ev.target.result}">`;
+      forgeBtn.disabled = false;
+      tileCount.textContent = 'image loaded';
+      log(`❯ image loaded: ${file.name} · ${img.naturalWidth}×${img.naturalHeight}px`);
+      log('❯ ready to forge · select layout and hit FORGE', 'log-dim');
+    };
+    img.src = ev.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+forgeBtn.addEventListener('click', forge);
+clearBtn.addEventListener('click', clearForge);
+
+function clearForge(){
+  sourceImg = null;
+  dropZone.classList.remove('has-image');
+  dropZone.innerHTML = `<div>drop or tap to load image</div><input type="file" id="fileInput" accept="image/*">`;
+  wireFileInput();
+  forgeBtn.disabled = true;
+  document.getElementById('outputSection').style.display = 'none';
+  log('❯ rm -rf · forge cleared', 'log-dim');
+}
+
+function borderCss(style){
+  switch(style){
+    case 'thin': return '1px solid rgba(240,244,240,.25)';
+    case 'thick': return '3px solid var(--deep)';
+    case 'glow': return '1px solid var(--acid)';
+    default: return 'none';
+  }
+}
+
+function forge(){
+  if (!sourceImg) return;
+  const layout = document.getElementById('gridLayout').value;
+  const [cols, rows] = layout.split('x').map(Number);
+  const targetAspect = cols / rows;
+
+  const nw = sourceImg.naturalWidth, nh = sourceImg.naturalHeight;
+  let sx, sy, sw, sh;
+  if (nw / nh > targetAspect){ sh=nh; sw=nh*targetAspect; sx=(nw-sw)/2; sy=0; }
+  else { sw=nw; sh=nw/targetAspect; sx=0; sy=(nh-sh)/2; }
+  const tileW = sw/cols, tileH = sh/rows;
+  const outSize = Math.min(1080, Math.round(Math.min(tileW, tileH)));
+
+  log(`❯ forging ${cols}×${rows} grid · ${cols*rows} tiles...`);
+
+  const preview = document.getElementById('gridPreview');
+  preview.innerHTML = '';
+  preview.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+  const border = borderCss(document.getElementById('borderStyle').value);
+  const tiles = [];
+
+  let n = 1;
+  for (let r=0; r<rows; r++){
+    for (let c=0; c<cols; c++){
+      const canvas = document.createElement('canvas');
+      canvas.width = outSize; canvas.height = outSize;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(sourceImg, sx+c*tileW, sy+r*tileH, tileW, tileH, 0, 0, outSize, outSize);
+      const dataUrl = canvas.toDataURL('image/png');
+      tiles.push(dataUrl);
+
+      const num = String(n).padStart(2,'0');
+      const cell = document.createElement('div');
+      cell.className = 'grid-tile';
+      cell.style.border = border;
+      cell.innerHTML = `<img src="${dataUrl}"><div class="tile-badge">${num}</div><div class="tile-dl">tap to download</div>`;
+      cell.addEventListener('click', ()=>{
+        saveImage(dataUrl, `gridforge_tile_${num}.png`);
+        toast(`tile ${num} saved`);
+        log(`❯ tile ${num} downloaded`);
+      });
+      preview.appendChild(cell);
+      n++;
+    }
+  }
+
+  document.getElementById('outputDims').textContent = `${cols}×${rows} · ${cols*rows} tiles · ${outSize}px`;
+  document.getElementById('outputSection').style.display = 'block';
+  document.getElementById('orderGuide').style.display = 'none';
+  log(`❯ ${cols*rows} tiles forged ✓`, 'log-acid');
+
+  window._forgeTiles = tiles;
+  window._forgeGrid = {cols, rows};
+}
+
+document.getElementById('downloadAllBtn').addEventListener('click', ()=>{
+  const tiles = window._forgeTiles;
+  if (!tiles) return;
+  log(`❯ downloading all ${tiles.length} tiles...`);
+  tiles.forEach((dataUrl,i)=>{
+    setTimeout(()=>{
+      const num = String(i+1).padStart(2,'0');
+      saveImage(dataUrl, `gridforge_tile_${num}.png`);
+      log(`❯ tile ${num} downloaded`);
+    }, i*250);
+  });
+  toast('saving all tiles…');
+});
+
+document.getElementById('orderGuideBtn').addEventListener('click', ()=>{
+  const g = window._forgeGrid; if (!g) return;
+  const total = g.cols*g.rows;
+  const order = []; for (let i=total; i>=1; i--) order.push(i);
+  document.getElementById('orderStrip').innerHTML = order.map((n,i)=>`<span class="order-chip">${i+1}. tile ${String(n).padStart(2,'0')}</span>`).join('');
+  document.getElementById('orderGuide').style.display = 'block';
+});
 </script>
 </body>
 </html>
